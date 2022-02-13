@@ -82,6 +82,63 @@ public class PathUtils {
 				path.add("/test/");
 			}
 		}
+		// for the one-line patched D4J 2.0 projects
+		else if (projectName.equals("Cli")) {
+			if (bugId == 40){
+				// /src/main/java/:/src/test/java/:/target/classes/:/target/test-classes/
+				path.add("/target/classes/");
+				path.add("/target/test-classes/");
+				path.add("/src/main/java/");
+				path.add("/src/test/java/");
+			} else {
+				// /src/java/:/src/test/:/target/classes/:/target/test-classes/
+				path.add("/target/classes/");
+				path.add("/target/test-classes/");
+				path.add("/src/java/");
+				path.add("/src/test/");
+			}
+		} else if (projectName.equals("Codec")) {
+			if (bugId <= 10){
+				// /src/java/:/src/test/:/target/classes/:/target/tests/
+				path.add("/target/classes/");
+				path.add("/target/tests/");
+				path.add("/src/java/");
+				path.add("/src/test/");
+			} else if (bugId == 16){
+				// /src/main/java/:/src/test/java/:/target/classes/:/target/tests/
+				path.add("/target/classes/");
+				path.add("/target/tests/");
+				path.add("/src/main/java/");
+				path.add("/src/test/java/");
+			} else {
+				// /src/main/java/:/src/test/java/:/target/classes/:/target/test-classes/
+				path.add("/target/classes/");
+				path.add("/target/test-classes/");
+				path.add("/src/main/java/");
+				path.add("/src/test/java/");
+
+			}
+		} else if (projectName.equals("Collections")) {
+			// /src/main/java/:/src/test/java/:/target/classes/:/target/tests/
+			path.add("/target/classes/");
+			path.add("/target/tests/");
+			path.add("/src/main/java/");
+			path.add("/src/test/java/");
+		} else if (projectName.equals("Compress") || projectName.equals("Csv")
+				|| projectName.equals("JacksonCore") || projectName.equals("JacksonDatabind")
+				|| projectName.equals("JacksonXml") || projectName.equals("Jsoup") ){
+			// /src/main/java/:/src/test/java/:/target/classes/:/target/test-classes/
+			path.add("/target/classes/");
+			path.add("/target/test-classes/");
+			path.add("/src/main/java/");
+			path.add("/src/test/java/");
+		} else if (projectName.equals("JxPath")) {
+			// /src/java/:/src/test/:/target/classes/:/target/test-classes/
+			path.add("/target/classes/");
+			path.add("/target/test-classes/");
+			path.add("/src/java/");
+			path.add("/src/test/");
+		}
 		return path;
 	}
 
