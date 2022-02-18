@@ -124,6 +124,12 @@ public class PathUtils {
 			path.add("/target/tests/");
 			path.add("/src/main/java/");
 			path.add("/src/test/java/");
+		} else if (projectName.equals("Gson")) {
+			// /src/main/java/:/src/test/java/:/target/classes/:/target/tests/
+			path.add("/target/classes/");
+			path.add("/target/test-classes/");
+			path.add("/gson/src/main/java/");
+			path.add("/gson/src/test/java/");
 		} else if (projectName.equals("Compress") || projectName.equals("Csv")
 				|| projectName.equals("JacksonCore") || projectName.equals("JacksonDatabind")
 				|| projectName.equals("JacksonXml") || projectName.equals("Jsoup") ){
