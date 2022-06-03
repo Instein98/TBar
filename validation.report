@@ -1,0 +1,2475 @@
+
+======================== Cli_11 ========================
+****** Correct Fix (right side is the fixed file) ******
+632c632
+<         if (option.hasArg() && (option.getArgName() != null))
+---
+>         if (option.hasArg() && option.hasArgName())
+
+# Plausible: 4
+# Non-plausible: 17  (can compile)
+# Fail-to-compile: 1
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 0 ************************
+632c632
+<         if (option.hasArg() && (option.getArgName() != null))
+---
+>         if (option.hasArg() && (option.getArgName() == null))
+
+************************ plausible patch: 1 ************************
+632c632
+<         if (option.hasArg() && (option.getArgName() != null))
+---
+>         if ((option.hasArg() && (option.getArgName() != null)) || (option.hasArgName()))
+
+************************ plausible patch: 2 ************************
+632c632
+<         if (option.hasArg() && (option.getArgName() != null))
+---
+>         if ((option.hasArg() && (option.getArgName() != null)) && (option.hasArgName()))
+
+************************ plausible patch: 20 ************************
+632,635c632
+<         if (option.hasArg() && (option.getArgName() != null))
+<         {
+<             buff.append(" <").append(option.getArgName()).append(">");
+<         }
+---
+>         
+
+
+======================== Cli_17 ========================
+****** Correct Fix (right side is the fixed file) ******
+302a303
+>                 break;
+
+# Plausible: 0
+# Non-plausible: 17  (can compile)
+# Fail-to-compile: 3
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Cli_25 ========================
+****** Correct Fix (right side is the fixed file) ******
+825c825
+<             nextLineTabStop = width - 1;
+---
+>             nextLineTabStop = 1;
+
+# Plausible: 4
+# Non-plausible: 13  (can compile)
+# Fail-to-compile: 3
+# Timeout: 10  (timeout threshold is set to 180s)
+
+************************ plausible patch: 1 ************************
+825c825
+<             nextLineTabStop = width - 1;
+---
+>             nextLineTabStop -= width - 1;
+
+************************ plausible patch: 10 ************************
+825c825
+<             nextLineTabStop = width - 1;
+---
+>             nextLineTabStop >>>= width - 1;
+
+************************ plausible patch: 3 ************************
+825c825
+<             nextLineTabStop = width - 1;
+---
+>             nextLineTabStop /= width - 1;
+
+************************ plausible patch: 4 ************************
+825c825
+<             nextLineTabStop = width - 1;
+---
+>             nextLineTabStop %= width - 1;
+
+
+======================== Cli_28 ========================
+****** Correct Fix (right side is the fixed file) ******
+290c290
+<                     break;
+---
+>                     continue;
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 1
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Cli_40 ========================
+****** Correct Fix (right side is the fixed file) ******
+103c103
+<             return null;
+---
+>             throw new ParseException("Unable to handle the class: " + clazz);
+
+# Plausible: 0
+# Non-plausible: 1  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Cli_8 ========================
+****** Correct Fix (right side is the fixed file) ******
+812c812
+<             pos = findWrapPos(text, width, nextLineTabStop);
+---
+>             pos = findWrapPos(text, width, 0);
+
+# Plausible: 2
+# Non-plausible: 287  (can compile)
+# Fail-to-compile: 7
+# Timeout: 6  (timeout threshold is set to 180s)
+
+************************ plausible patch: 21 ************************
+812c812
+<             pos = findWrapPos(text, width, nextLineTabStop);
+---
+>             pos = findWrapPos(text, width, this.defaultLeftPad);
+
+************************ plausible patch: 210 ************************
+812c812
+<             pos = findWrapPos(text, width, nextLineTabStop);
+---
+>             pos = findWrapPos(this.defaultOptPrefix, this.defaultWidth, pos);
+
+
+======================== Codec_10 ========================
+****** Correct Fix (right side is the fixed file) ******
+76c76
+<         txt = txt.replaceAll("^mb", "m2");
+---
+>         txt = txt.replaceAll("mb$", "m2");
+
+# Plausible: 0
+# Non-plausible: 60  (can compile)
+# Fail-to-compile: 2
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Codec_16 ========================
+****** Correct Fix (right side is the fixed file) ******
+99c99
+<             25, 26, 27, 28, 29, 30, 31, 32,
+---
+>             25, 26, 27, 28, 29, 30, 31,                                     // 50-57 P-V
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 117
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Codec_17 ========================
+****** Correct Fix (right side is the fixed file) ******
+339c339
+<         return new String(bytes, Charsets.ISO_8859_1);
+---
+>         return newString(bytes, Charsets.ISO_8859_1);
+
+# Plausible: 2
+# Non-plausible: 7  (can compile)
+# Fail-to-compile: 5
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 12 ************************
+339c339,340
+<         return new String(bytes, Charsets.ISO_8859_1);
+---
+>         if (!(bytes != null && Charsets.ISO_8859_1 != null)) return null;
+> 	return new String(bytes, Charsets.ISO_8859_1);
+
+************************ plausible patch: 4 ************************
+339c339,342
+<         return new String(bytes, Charsets.ISO_8859_1);
+---
+>         if (bytes == null) {
+> 	    return null;
+> 	}
+> return new String(bytes, Charsets.ISO_8859_1);
+
+
+======================== Codec_18 ========================
+****** Correct Fix (right side is the fixed file) ******
+81c81
+<         return CharSequenceUtils.regionMatches(cs1, false, 0, cs2, 0, Math.max(cs1.length(), cs2.length()));
+---
+>         return cs1.length() == cs2.length() && CharSequenceUtils.regionMatches(cs1, false, 0, cs2, 0, cs1.length());
+
+# Plausible: 0
+# Non-plausible: 19  (can compile)
+# Fail-to-compile: 10
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Codec_2 ========================
+****** Correct Fix (right side is the fixed file) ******
+446c446
+<             if (lineLength > 0) {
+---
+>             if (lineLength > 0 && pos > 0) {
+
+# Plausible: 0
+# Non-plausible: 29  (can compile)
+# Fail-to-compile: 2
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Codec_3 ========================
+****** Correct Fix (right side is the fixed file) ******
+455c455
+<             } else if (contains(value, index + 1, 4, "IER")) {
+---
+>             } else if (contains(value, index + 1, 3, "IER")) {
+
+# Plausible: 0
+# Non-plausible: 727  (can compile)
+# Fail-to-compile: 31
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Codec_4 ========================
+****** Correct Fix (right side is the fixed file) ******
+225c225
+<         this(false);
+---
+>         this(0);
+
+# Plausible: 0
+# Non-plausible: 1  (can compile)
+# Fail-to-compile: 2
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Codec_7 ========================
+****** Correct Fix (right side is the fixed file) ******
+670c670
+<         return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+---
+>         return StringUtils.newStringUtf8(encodeBase64(binaryData, false));
+
+# Plausible: 2
+# Non-plausible: 9  (can compile)
+# Fail-to-compile: 20
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 25 ************************
+670c670
+<         return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+---
+>         return StringUtils.newStringUtf8(encodeBase64(binaryData, false));
+
+************************ plausible patch: 3 ************************
+670c670
+<         return StringUtils.newStringUtf8(encodeBase64(binaryData, true));
+---
+>         return StringUtils.newStringUtf8(encodeBase64(binaryData));
+
+
+======================== Codec_9 ========================
+****** Correct Fix (right side is the fixed file) ******
+827c827
+<         long len = getEncodeLength(binaryData, MIME_CHUNK_SIZE, CHUNK_SEPARATOR);
+---
+>         long len = getEncodeLength(binaryData, isChunked ? MIME_CHUNK_SIZE : 0, CHUNK_SEPARATOR);
+
+# Plausible: 1
+# Non-plausible: 21  (can compile)
+# Fail-to-compile: 188
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 13 ************************
+827c827
+<         long len = getEncodeLength(binaryData, MIME_CHUNK_SIZE, CHUNK_SEPARATOR);
+---
+>         long len = getEncodeLength(binaryData, DEFAULT_BUFFER_RESIZE_FACTOR, CHUNK_SEPARATOR);
+
+
+======================== Collections_26 ========================
+****** Correct Fix (right side is the fixed file) ******
+277c277
+<     private Object readResolve() {
+---
+>     protected Object readResolve() {
+
+# Plausible: 0
+# Non-plausible: 2  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Compress_1 ========================
+****** Correct Fix (right side is the fixed file) ******
+345a346
+>             this.finish();
+
+# Plausible: 0
+# Non-plausible: 8  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Compress_19 ========================
+****** Correct Fix (right side is the fixed file) ******
+259c259
+<             if (rawCentralDirectoryData.length != expectedLength) {
+---
+>             if (rawCentralDirectoryData.length < expectedLength) {
+
+# Plausible: 2
+# Non-plausible: 5  (can compile)
+# Fail-to-compile: 39
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 1 ************************
+259c259
+<             if (rawCentralDirectoryData.length != expectedLength) {
+---
+>             if (rawCentralDirectoryData.length<expectedLength) {
+
+************************ plausible patch: 44 ************************
+259,266c259
+<             if (rawCentralDirectoryData.length != expectedLength) {
+<                 throw new ZipException("central directory zip64 extended"
+<                                        + " information extra field's length"
+<                                        + " doesn't match central directory"
+<                                        + " data.  Expected length "
+<                                        + expectedLength + " but is "
+<                                        + rawCentralDirectoryData.length);
+<             }
+---
+>             
+
+
+======================== Compress_23 ========================
+****** Correct Fix (right side is the fixed file) ******
+112c112
+<                 dictSize |= (coder.properties[i + 1] << (8 * i));
+---
+>                 dictSize |= (coder.properties[i + 1] & 0xffl) << (8 * i);
+
+# Plausible: 0
+# Non-plausible: 9  (can compile)
+# Fail-to-compile: 11
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Compress_25 ========================
+****** Correct Fix (right side is the fixed file) ******
+183a184
+>         buf.limit(0);
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Compress_38 ========================
+****** Correct Fix (right side is the fixed file) ******
+859c859
+<         if (getName().endsWith("/")) {
+---
+>         if (!isPaxHeader() && !isGlobalPaxHeader() && getName().endsWith("/")) {
+
+# Plausible: 4
+# Non-plausible: 2  (can compile)
+# Fail-to-compile: 35
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 18 ************************
+859c859
+<         if (getName().endsWith("/")) {
+---
+>         if (getLinkName().endsWith("/")) {
+
+************************ plausible patch: 19 ************************
+859c859
+<         if (getName().endsWith("/")) {
+---
+>         if (getUserName().endsWith("/")) {
+
+************************ plausible patch: 20 ************************
+859c859
+<         if (getName().endsWith("/")) {
+---
+>         if (getGroupName().endsWith("/")) {
+
+************************ plausible patch: 39 ************************
+859,861c859
+<         if (getName().endsWith("/")) {
+<             return true;
+<         }
+---
+>         
+
+
+======================== Csv_1 ========================
+****** Correct Fix (right side is the fixed file) ******
+58c58
+<         if (current == '\n') {
+---
+>         if (current == '\r' || (current == '\n' && lastChar != '\r')) {
+
+# Plausible: 0
+# Non-plausible: 86  (can compile)
+# Fail-to-compile: 0
+# Timeout: 1  (timeout threshold is set to 180s)
+
+
+======================== Csv_11 ========================
+****** Correct Fix (right side is the fixed file) ******
+384c384
+<                     final boolean emptyHeader = header.trim().isEmpty();
+---
+>                     final boolean emptyHeader = header == null || header.trim().isEmpty();
+
+# Plausible: 5
+# Non-plausible: 3  (can compile)
+# Fail-to-compile: 10
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 11 ************************
+384c384,385
+<                     final boolean emptyHeader = header.trim().isEmpty();
+---
+>                     if (header == null) return hdrMap;
+> 	 final boolean emptyHeader = header.trim().isEmpty();
+
+************************ plausible patch: 12 ************************
+384c384,385
+<                     final boolean emptyHeader = header.trim().isEmpty();
+---
+>                     if (header == null) return this.headerMap;
+> 	 final boolean emptyHeader = header.trim().isEmpty();
+
+************************ plausible patch: 13 ************************
+384c384,385
+<                     final boolean emptyHeader = header.trim().isEmpty();
+---
+>                     if (header == null) continue;
+> 	final boolean emptyHeader = header.trim().isEmpty();
+
+************************ plausible patch: 6 ************************
+384c384,385
+<                     final boolean emptyHeader = header.trim().isEmpty();
+---
+>                     if (header != null) {
+> 	final boolean emptyHeader = header.trim().isEmpty();
+389a391,392
+> 	}
+> 
+
+************************ plausible patch: 8 ************************
+384c384,387
+<                     final boolean emptyHeader = header.trim().isEmpty();
+---
+>                     if (header == null) {
+> 	    return null;
+> 	}
+> final boolean emptyHeader = header.trim().isEmpty();
+
+
+======================== Csv_12 ========================
+****** Correct Fix (right side is the fixed file) ******
+219c219
+<     public static final CSVFormat EXCEL = DEFAULT.withIgnoreEmptyLines(false);
+---
+>     public static final CSVFormat EXCEL = DEFAULT.withIgnoreEmptyLines(false).withAllowMissingColumnNames(true);
+
+# Plausible: 0
+# Non-plausible: 2  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Csv_14 ========================
+****** Correct Fix (right side is the fixed file) ******
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < 0x20 || c > 0x21 && c < 0x23 || c > 0x2B && c < 0x2D || c > 0x7E)) {
+
+# Plausible: 47
+# Non-plausible: 150  (can compile)
+# Fail-to-compile: 186
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 105 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord == this.ignoreHeaderCase && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 109 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord == this.ignoreSurroundingSpaces && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 113 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord == this.skipHeaderRecord && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 117 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord == this.trailingDelimiter && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 121 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord == this.trim && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 125 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (c == quoteChar && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 129 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (c == delimChar && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 133 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (c == this.delimiter && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 140 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < '0' || c > '9' && c < 'A' && c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 141 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' && c > 'z')) {
+
+************************ plausible patch: 143 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (quote && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 144 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (this.allowMissingColumnNames && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 146 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (this.ignoreHeaderCase && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 147 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (this.ignoreSurroundingSpaces && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 148 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (this.skipHeaderRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 149 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (this.trailingDelimiter && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 15 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c=='Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 150 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (this.trim && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 160 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < '0' || c > '9' && c < 'A' || quoteChar > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 161 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < '0' || c > '9' && c < 'A' || delimChar > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 162 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < '0' || c > '9' && c < 'A' || this.delimiter > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 169 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (getAllowMissingColumnNames() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 176 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (getIgnoreHeaderCase() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 177 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (getIgnoreSurroundingSpaces() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 182 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (getSkipHeaderRecord() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 183 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (getTrailingDelimiter() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 184 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (getTrim() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 186 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (isCommentMarkerSet() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 187 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (isEscapeCharacterSet() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 188 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (isNullStringSet() && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 291 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < '0' || c > '9' && c < 'A' || getDelimiter() > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 299 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord && (c < '0' || c > '9' && c < 'A' || getQuoteCharacter() > 'Z' && c < 'a' || c > 'z')) {
+
+************************ plausible patch: 32 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (!newRecord)) {
+
+************************ plausible patch: 36 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c == quoteChar)) {
+
+************************ plausible patch: 379 ************************
+1039,1041c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+<                     quote = true;
+<                 } else if (c <= COMMENT) {
+---
+>                 if (c <= COMMENT) {
+
+************************ plausible patch: 52 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c == LF)) {
+
+************************ plausible patch: 56 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c == CR || c == LF)) {
+
+************************ plausible patch: 64 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c == CR)) {
+
+************************ plausible patch: 68 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c <= COMMENT)) {
+
+************************ plausible patch: 72 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c == LF || c == CR || c == quoteChar || c == delimChar)) {
+
+************************ plausible patch: 76 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c == LF || c == CR || c == quoteChar)) {
+
+************************ plausible patch: 80 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c <= SP)) {
+
+************************ plausible patch: 84 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c == delimChar)) {
+
+************************ plausible patch: 88 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if ((newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) && (c == LF || c == CR)) {
+
+************************ plausible patch: 93 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord == quote && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 97 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord == this.allowMissingColumnNames && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+************************ plausible patch: 99 ************************
+1039c1039
+<                 if (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z')) {
+---
+>                 if (newRecord != this.ignoreEmptyLines && (newRecord && (c < '0' || c > '9' && c < 'A' || c > 'Z' && c < 'a' || c > 'z'))) {
+
+
+======================== Csv_4 ========================
+****** Correct Fix (right side is the fixed file) ******
+288c288
+<         return new LinkedHashMap<String, Integer>(this.headerMap);
+---
+>         return this.headerMap == null ? null : new LinkedHashMap<String, Integer>(this.headerMap);
+
+# Plausible: 2
+# Non-plausible: 4  (can compile)
+# Fail-to-compile: 4
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 0 ************************
+288c288,289
+<         return new LinkedHashMap<String, Integer>(this.headerMap);
+---
+>         return this.headerMap;
+> 
+
+************************ plausible patch: 4 ************************
+288c288,291
+<         return new LinkedHashMap<String, Integer>(this.headerMap);
+---
+>         if (this.headerMap == null) {
+> 	    return null;
+> 	}
+> return new LinkedHashMap<String, Integer>(this.headerMap);
+
+
+======================== Gson_11 ========================
+****** Correct Fix (right side is the fixed file) ******
+370a371
+>       case STRING:
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Gson_13 ========================
+****** Correct Fix (right side is the fixed file) ******
+731c731
+<     if (last == NUMBER_CHAR_DIGIT && fitsInLong && (value != Long.MIN_VALUE || negative)) {
+---
+>     if (last == NUMBER_CHAR_DIGIT && fitsInLong && (value != Long.MIN_VALUE || negative) && (value!=0 || false==negative)) {
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Gson_15 ========================
+****** Correct Fix (right side is the fixed file) ******
+495c495
+<     if (Double.isNaN(value) || Double.isInfinite(value)) {
+---
+>     if (!lenient && (Double.isNaN(value) || Double.isInfinite(value))) {
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Gson_5 ========================
+****** Correct Fix (right side is the fixed file) ******
+213a214
+>                 timezoneOffset = timezoneOffset.length() >= 5 ? timezoneOffset : timezoneOffset + "00";
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonCore_11 ========================
+****** Correct Fix (right side is the fixed file) ******
+881a882
+>             _verifyNeedForRehash();
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonCore_25 ========================
+****** Correct Fix (right side is the fixed file) ******
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i < maxCode) {
+
+# Plausible: 112
+# Non-plausible: 303  (can compile)
+# Fail-to-compile: 50
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 1 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i!=maxCode) {
+
+************************ plausible patch: 10 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_QUOTE)) {
+
+************************ plausible patch: 106 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_LF)) {
+
+************************ plausible patch: 114 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_SLASH || i == INT_HASH)) {
+
+************************ plausible patch: 118 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && ((i == INT_QUOTE))) {
+
+************************ plausible patch: 126 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_SLASH)) {
+
+************************ plausible patch: 130 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_HASH)) {
+
+************************ plausible patch: 134 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == '*')) {
+
+************************ plausible patch: 138 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == '\\')) {
+
+************************ plausible patch: 146 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_BACKSLASH)) {
+
+************************ plausible patch: 152 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(i != INT_COLON)) {
+
+************************ plausible patch: 154 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && ((i == INT_RBRACKET) || (i == INT_RCURLY))) {
+
+************************ plausible patch: 16 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(i != INT_COMMA)) {
+
+************************ plausible patch: 160 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(i != INT_SLASH && i != INT_HASH)) {
+
+************************ plausible patch: 162 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_CR)) {
+
+************************ plausible patch: 166 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i <= INT_QUOTE)) {
+
+************************ plausible patch: 170 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && ((i == INT_RCURLY))) {
+
+************************ plausible patch: 174 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && ((i == INT_RBRACKET))) {
+
+************************ plausible patch: 18 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_RBRACKET || i == INT_RCURLY)) {
+
+************************ plausible patch: 180 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(i != INT_SLASH)) {
+
+************************ plausible patch: 182 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i <= '\'')) {
+
+************************ plausible patch: 188 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(i != INT_HASH)) {
+
+************************ plausible patch: 196 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(i != INT_TAB)) {
+
+************************ plausible patch: 2 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i<maxCode) {
+
+************************ plausible patch: 201 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i != maxCode && (i <= maxCode)) {
+
+************************ plausible patch: 205 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i < maxCode && (i <= maxCode)) {
+
+************************ plausible patch: 209 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i > maxCode && (i <= maxCode)) {
+
+************************ plausible patch: 215 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i == outPtr && (i <= maxCode)) {
+
+************************ plausible patch: 217 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i < outPtr && (i <= maxCode)) {
+
+************************ plausible patch: 219 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i <= outPtr && (i <= maxCode)) {
+
+************************ plausible patch: 22 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i < 0)) {
+
+************************ plausible patch: 227 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i == startPtr && (i <= maxCode)) {
+
+************************ plausible patch: 233 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i > startPtr && (i <= maxCode)) {
+
+************************ plausible patch: 235 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i >= startPtr && (i <= maxCode)) {
+
+************************ plausible patch: 239 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i == hash && (i <= maxCode)) {
+
+************************ plausible patch: 245 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i > hash && (i <= maxCode)) {
+
+************************ plausible patch: 247 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i >= hash && (i <= maxCode)) {
+
+************************ plausible patch: 251 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i == FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 257 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i > FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 259 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i >= FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 26 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_COLON)) {
+
+************************ plausible patch: 263 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i == ReaderBasedJsonParser.FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 269 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i > ReaderBasedJsonParser.FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 271 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i >= ReaderBasedJsonParser.FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 275 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i == this._hashSeed && (i <= maxCode)) {
+
+************************ plausible patch: 281 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i > this._hashSeed && (i <= maxCode)) {
+
+************************ plausible patch: 283 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i >= this._hashSeed && (i <= maxCode)) {
+
+************************ plausible patch: 287 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i == this._nameStartRow && (i <= maxCode)) {
+
+************************ plausible patch: 289 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i < this._nameStartRow && (i <= maxCode)) {
+
+************************ plausible patch: 291 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i <= this._nameStartRow && (i <= maxCode)) {
+
+************************ plausible patch: 299 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i == this._nameStartCol && (i <= maxCode)) {
+
+************************ plausible patch: 3 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i>maxCode) {
+
+************************ plausible patch: 30 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == '\'' && isEnabled(Feature.ALLOW_SINGLE_QUOTES))) {
+
+************************ plausible patch: 305 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i > this._nameStartCol && (i <= maxCode)) {
+
+************************ plausible patch: 307 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i >= this._nameStartCol && (i <= maxCode)) {
+
+************************ plausible patch: 311 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode == outPtr && (i <= maxCode)) {
+
+************************ plausible patch: 313 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode < outPtr && (i <= maxCode)) {
+
+************************ plausible patch: 315 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode <= outPtr && (i <= maxCode)) {
+
+************************ plausible patch: 323 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode == startPtr && (i <= maxCode)) {
+
+************************ plausible patch: 329 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode > startPtr && (i <= maxCode)) {
+
+************************ plausible patch: 331 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode >= startPtr && (i <= maxCode)) {
+
+************************ plausible patch: 335 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode == hash && (i <= maxCode)) {
+
+************************ plausible patch: 341 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode > hash && (i <= maxCode)) {
+
+************************ plausible patch: 343 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode >= hash && (i <= maxCode)) {
+
+************************ plausible patch: 347 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode == FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 353 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode > FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 355 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode >= FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 359 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode == ReaderBasedJsonParser.FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 36 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(Character.isJavaIdentifierStart(i))) {
+
+************************ plausible patch: 365 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode > ReaderBasedJsonParser.FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 367 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode >= ReaderBasedJsonParser.FEAT_MASK_TRAILING_COMMA && (i <= maxCode)) {
+
+************************ plausible patch: 371 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode == this._hashSeed && (i <= maxCode)) {
+
+************************ plausible patch: 377 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode > this._hashSeed && (i <= maxCode)) {
+
+************************ plausible patch: 379 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode >= this._hashSeed && (i <= maxCode)) {
+
+************************ plausible patch: 383 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode == this._nameStartRow && (i <= maxCode)) {
+
+************************ plausible patch: 385 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode < this._nameStartRow && (i <= maxCode)) {
+
+************************ plausible patch: 387 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode <= this._nameStartRow && (i <= maxCode)) {
+
+************************ plausible patch: 395 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode == this._nameStartCol && (i <= maxCode)) {
+
+************************ plausible patch: 401 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode > this._nameStartCol && (i <= maxCode)) {
+
+************************ plausible patch: 403 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (maxCode >= this._nameStartCol && (i <= maxCode)) {
+
+************************ plausible patch: 406 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (startPtr <= maxCode) {
+
+************************ plausible patch: 407 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (hash <= maxCode) {
+
+************************ plausible patch: 408 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (this._hashSeed <= maxCode) {
+
+************************ plausible patch: 410 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (this._nameStartCol <= maxCode) {
+
+************************ plausible patch: 412 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i <= this._nameStartRow) {
+
+************************ plausible patch: 415 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if (i <= outPtr) {
+
+************************ plausible patch: 42 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_SPACE || i == INT_TAB)) {
+
+************************ plausible patch: 439 ************************
+1963,1967c1963
+<             if (i <= maxCode) {
+<                 if (codes[i] != 0) {
+<                     break;
+<                 }
+<             } else if (!Character.isJavaIdentifierPart(c)) {
+---
+>             if (!Character.isJavaIdentifierPart(c)) {
+
+************************ plausible patch: 441 ************************
+1963,1969c1963
+<             if (i <= maxCode) {
+<                 if (codes[i] != 0) {
+<                     break;
+<                 }
+<             } else if (!Character.isJavaIdentifierPart(c)) {
+<                 break;
+<             }
+---
+>             
+
+************************ plausible patch: 443 ************************
+1963,1969c1963
+<             if (i <= maxCode) {
+<                 if (codes[i] != 0) {
+<                     break;
+<                 }
+<             } else if (!Character.isJavaIdentifierPart(c)) {
+<                 break;
+<             }
+---
+>             _isNextTokenNameYes(maxCode);
+
+************************ plausible patch: 444 ************************
+1963c1963,1964
+<             if (i <= maxCode) {
+---
+>             _isNextTokenNameYes(maxCode);
+> 	if (i <= maxCode) {
+
+************************ plausible patch: 446 ************************
+1963,1969c1963
+<             if (i <= maxCode) {
+<                 if (codes[i] != 0) {
+<                     break;
+<                 }
+<             } else if (!Character.isJavaIdentifierPart(c)) {
+<                 break;
+<             }
+---
+>             _isNextTokenNameYes(i);
+
+************************ plausible patch: 447 ************************
+1963c1963,1964
+<             if (i <= maxCode) {
+---
+>             _isNextTokenNameYes(i);
+> 	if (i <= maxCode) {
+
+************************ plausible patch: 449 ************************
+1963,1969c1963
+<             if (i <= maxCode) {
+<                 if (codes[i] != 0) {
+<                     break;
+<                 }
+<             } else if (!Character.isJavaIdentifierPart(c)) {
+<                 break;
+<             }
+---
+>             _verifyRootSpace(maxCode);
+
+************************ plausible patch: 450 ************************
+1963c1963,1964
+<             if (i <= maxCode) {
+---
+>             _verifyRootSpace(maxCode);
+> 	if (i <= maxCode) {
+
+************************ plausible patch: 452 ************************
+1963,1969c1963
+<             if (i <= maxCode) {
+<                 if (codes[i] != 0) {
+<                     break;
+<                 }
+<             } else if (!Character.isJavaIdentifierPart(c)) {
+<                 break;
+<             }
+---
+>             _verifyRootSpace(i);
+
+************************ plausible patch: 453 ************************
+1963c1963,1964
+<             if (i <= maxCode) {
+---
+>             _verifyRootSpace(i);
+> 	if (i <= maxCode) {
+
+************************ plausible patch: 459 ************************
+1963,1969c1963
+<             if (i <= maxCode) {
+<                 if (codes[i] != 0) {
+<                     break;
+<                 }
+<             } else if (!Character.isJavaIdentifierPart(c)) {
+<                 break;
+<             }
+---
+>             _closeScope(maxCode);
+
+************************ plausible patch: 462 ************************
+1963,1969c1963
+<             if (i <= maxCode) {
+<                 if (codes[i] != 0) {
+<                     break;
+<                 }
+<             } else if (!Character.isJavaIdentifierPart(c)) {
+<                 break;
+<             }
+---
+>             _closeScope(i);
+
+************************ plausible patch: 48 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(i > INT_SPACE)) {
+
+************************ plausible patch: 50 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_RBRACKET)) {
+
+************************ plausible patch: 54 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i < maxCode)) {
+
+************************ plausible patch: 6 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_RCURLY)) {
+
+************************ plausible patch: 60 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && !(i != INT_SPACE)) {
+
+************************ plausible patch: 62 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i <= INT_BACKSLASH)) {
+
+************************ plausible patch: 66 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == '\'')) {
+
+************************ plausible patch: 70 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_SPACE)) {
+
+************************ plausible patch: 74 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i < INT_SPACE)) {
+
+************************ plausible patch: 78 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i == INT_TAB)) {
+
+************************ plausible patch: 82 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i <= '\\')) {
+
+************************ plausible patch: 86 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i < maxCode && codes[i] != 0)) {
+
+************************ plausible patch: 90 ************************
+1963c1963
+<             if (i <= maxCode) {
+---
+>             if ((i <= maxCode) && (i <= '*')) {
+
+
+======================== JacksonCore_26 ========================
+****** Correct Fix (right side is the fixed file) ******
+107a108
+>         _currBufferStart = start;
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonCore_5 ========================
+****** Correct Fix (right side is the fixed file) ******
+193c193
+<             char c = str.charAt(i++);
+---
+>             char c = str.charAt(i);
+
+# Plausible: 0
+# Non-plausible: 9  (can compile)
+# Fail-to-compile: 25
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonCore_8 ========================
+****** Correct Fix (right side is the fixed file) ******
+307c307
+<         if (!_hasSegments)  return _currentSegment;
+---
+>         if (!_hasSegments && _currentSegment != null)  return _currentSegment;
+
+# Plausible: 2
+# Non-plausible: 12  (can compile)
+# Fail-to-compile: 18
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 22 ************************
+307c307
+<         if (!_hasSegments)  return _currentSegment;
+---
+>         
+
+************************ plausible patch: 5 ************************
+307c307
+<         if (!_hasSegments)  return _currentSegment;
+---
+>         if (!hasTextAsCharacters())  return _currentSegment;
+
+
+======================== JacksonDatabind_1 ========================
+****** Correct Fix (right side is the fixed file) ******
+591a592
+>             return;
+
+# Plausible: 1
+# Non-plausible: 17  (can compile)
+# Fail-to-compile: 4
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 20 ************************
+587,591c587
+<             if (_nullSerializer != null) {
+<                 _nullSerializer.serialize(null, jgen, prov);
+<             } else { // can NOT suppress entries in tabular output
+<                 jgen.writeNull();
+<             }
+---
+>             
+
+
+======================== JacksonDatabind_107 ========================
+****** Correct Fix (right side is the fixed file) ******
+165c165
+<                         return null;
+---
+>                         return NullifyingDeserializer.instance;
+
+# Plausible: 0
+# Non-plausible: 2  (can compile)
+# Fail-to-compile: 1
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_16 ========================
+****** Correct Fix (right side is the fixed file) ******
+112c112
+<         return (previous != null) && previous.equals(ann);
+---
+>         return (previous == null) || !previous.equals(ann);
+
+# Plausible: 1
+# Non-plausible: 16  (can compile)
+# Fail-to-compile: 5
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 2 ************************
+112c112
+<         return (previous != null) && previous.equals(ann);
+---
+>         return ((previous != null) && previous.equals(ann)) || !(!_annotations.containsKey(ann.annotationType()));
+
+
+======================== JacksonDatabind_17 ========================
+****** Correct Fix (right side is the fixed file) ******
+180c180
+<                         || TreeNode.class.isAssignableFrom(t.getRawClass()));
+---
+>                                 && !TreeNode.class.isAssignableFrom(t.getRawClass()));
+
+# Plausible: 0
+# Non-plausible: 25  (can compile)
+# Fail-to-compile: 62
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_27 ========================
+****** Correct Fix (right side is the fixed file) ******
+794c794
+<                 if (ext.handlePropertyValue(p, ctxt, propName, buffer)) {
+---
+>                 if (ext.handlePropertyValue(p, ctxt, propName, null)) {
+
+# Plausible: 0
+# Non-plausible: 68  (can compile)
+# Fail-to-compile: 13
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_34 ========================
+****** Correct Fix (right side is the fixed file) ******
+81c81
+<                 visitFloatFormat(visitor, typeHint, JsonParser.NumberType.BIG_INTEGER);
+---
+>                 visitFloatFormat(visitor, typeHint, JsonParser.NumberType.BIG_DECIMAL);
+
+# Plausible: 0
+# Non-plausible: 11  (can compile)
+# Fail-to-compile: 8
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_37 ========================
+****** Correct Fix (right side is the fixed file) ******
+135c135
+<         return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+---
+>         return new SimpleType(subclass, _bindings, this, _superInterfaces,
+
+# Plausible: 0
+# Non-plausible: 12  (can compile)
+# Fail-to-compile: 68
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_46 ========================
+****** Correct Fix (right side is the fixed file) ******
+156c156
+<         sb.append(';');
+---
+>         sb.append(">;");
+
+# Plausible: 0
+# Non-plausible: 9  (can compile)
+# Fail-to-compile: 9
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_57 ========================
+****** Correct Fix (right side is the fixed file) ******
+1441c1441
+<         return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src), 
+---
+>         return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src, offset, length),
+
+# Plausible: 0
+# Non-plausible: 10  (can compile)
+# Fail-to-compile: 70
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_70 ========================
+****** Correct Fix (right side is the fixed file) ******
+440c440
+<                 found = key.equals(prop.getName());
+---
+>                 found = key.equals(_hashArea[i-1]);
+
+# Plausible: 0
+# Non-plausible: 34  (can compile)
+# Fail-to-compile: 8
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_71 ========================
+****** Correct Fix (right side is the fixed file) ******
+75c75
+<         if (raw == String.class || raw == Object.class) {
+---
+>         if (raw == String.class || raw == Object.class || raw == CharSequence.class) {
+
+# Plausible: 0
+# Non-plausible: 74  (can compile)
+# Fail-to-compile: 28
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_82 ========================
+****** Correct Fix (right side is the fixed file) ******
+495c495
+<             ignored = ignorals.getIgnored();
+---
+>             ignored = ignorals.findIgnoredForDeserialization();
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 2
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_96 ========================
+****** Correct Fix (right side is the fixed file) ******
+735c735
+<             paramName = candidate.findImplicitParamName(0);
+---
+>             paramName = candidate.paramName(0);
+
+# Plausible: 1
+# Non-plausible: 5  (can compile)
+# Fail-to-compile: 9
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 5 ************************
+735c735
+<             paramName = candidate.findImplicitParamName(0);
+---
+>             paramName = candidate.paramName(0);
+
+
+======================== JacksonDatabind_97 ========================
+****** Correct Fix (right side is the fixed file) ******
+114c114
+<             gen.writeObject(_value);
+---
+>             ctxt.defaultSerializeValue(_value, gen);
+
+# Plausible: 0
+# Non-plausible: 10  (can compile)
+# Fail-to-compile: 8
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JacksonDatabind_99 ========================
+****** Correct Fix (right side is the fixed file) ******
+168a169
+>         sb.append('>');
+
+# Plausible: 1
+# Non-plausible: 16  (can compile)
+# Fail-to-compile: 20
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 36 ************************
+162,170c162
+<     @Override
+<     protected String buildCanonicalName()
+<     {
+<         StringBuilder sb = new StringBuilder();
+<         sb.append(_class.getName());
+<         sb.append('<');
+<         sb.append(_referencedType.toCanonical());
+<         return sb.toString();
+<     }
+---
+>     
+
+
+======================== JacksonXml_5 ========================
+****** Correct Fix (right side is the fixed file) ******
+59c59
+<         _rootNameLookup = src._rootNameLookup;
+---
+>         _rootNameLookup = new XmlRootNameLookup();
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 5
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_15 ========================
+****** Correct Fix (right side is the fixed file) ******
+283c283
+<                     } else if (StringUtil.in(name, "base", "basefont", "bgsound", "command", "link", "meta", "noframes", "style", "title")) {
+---
+>                     } else if (StringUtil.in(name, "base", "basefont", "bgsound", "command", "link", "meta", "noframes", "script", "style", "title")) {
+
+# Plausible: 0
+# Non-plausible: 168  (can compile)
+# Fail-to-compile: 7
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_17 ========================
+****** Correct Fix (right side is the fixed file) ******
+1451c1451
+<     private static String nullString = String.valueOf(0x0000);
+---
+>     private static String nullString = String.valueOf('\u0000');
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 1
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_2 ========================
+****** Correct Fix (right side is the fixed file) ******
+147a148
+>             popStackToClose(tag);
+
+# Plausible: 0
+# Non-plausible: 26  (can compile)
+# Fail-to-compile: 9
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_24 ========================
+****** Correct Fix (right side is the fixed file) ******
+558d557
+<                 r.advance();
+
+# Plausible: 1
+# Non-plausible: 3  (can compile)
+# Fail-to-compile: 2
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 4 ************************
+558c558
+<                 r.advance();
+---
+>                 
+
+
+======================== Jsoup_25 ========================
+****** Correct Fix (right side is the fixed file) ******
+218c218
+<     private static final String[] preserveWhitespaceTags = {"pre", "plaintext", "title"};
+---
+>     private static final String[] preserveWhitespaceTags = {"pre", "plaintext", "title", "textarea"};
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 1
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_26 ========================
+****** Correct Fix (right side is the fixed file) ******
+42a43
+>         if (dirtyDocument.body() != null) // frameset documents won't have a body. the clean doc will have empty body.
+
+# Plausible: 0
+# Non-plausible: 3  (can compile)
+# Fail-to-compile: 7
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_32 ========================
+****** Correct Fix (right side is the fixed file) ******
+1138c1138
+<         clone.classNames();
+---
+>         clone.classNames = null; // derived on first hit, otherwise gets a pointer to source classnames
+
+# Plausible: 0
+# Non-plausible: 41  (can compile)
+# Fail-to-compile: 29
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_33 ========================
+****** Correct Fix (right side is the fixed file) ******
+161a162
+>             tokeniser.transition(TokeniserState.Data); // handles <script />, otherwise needs breakout steps from script data
+
+# Plausible: 0
+# Non-plausible: 59  (can compile)
+# Fail-to-compile: 23
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_34 ========================
+****** Correct Fix (right side is the fixed file) ******
+91c91
+<             if (offset < length) {
+---
+>             if (offset < length && last <= length) {
+
+# Plausible: 0
+# Non-plausible: 106  (can compile)
+# Fail-to-compile: 36
+# Timeout: 3  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_35 ========================
+****** Correct Fix (right side is the fixed file) ******
+725a726
+>                             adopter.attributes().addAll(formatEl.attributes());
+
+# Plausible: 0
+# Non-plausible: 10  (can compile)
+# Fail-to-compile: 3
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_37 ========================
+****** Correct Fix (right side is the fixed file) ******
+1101c1101
+<         return accum.toString().trim();
+---
+>         return getOutputSettings().prettyPrint() ? accum.toString().trim() : accum.toString();
+
+# Plausible: 0
+# Non-plausible: 36  (can compile)
+# Fail-to-compile: 9
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_39 ========================
+****** Correct Fix (right side is the fixed file) ******
+118a119
+>             doc = null;
+
+# Plausible: 0
+# Non-plausible: 8  (can compile)
+# Fail-to-compile: 7
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_40 ========================
+****** Correct Fix (right side is the fixed file) ******
+22d21
+<         Validate.notEmpty(name);
+
+# Plausible: 2
+# Non-plausible: 12  (can compile)
+# Fail-to-compile: 1
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 13 ************************
+22c22
+<         Validate.notEmpty(name);
+---
+>         
+
+************************ plausible patch: 3 ************************
+22c22
+<         Validate.notEmpty(name);
+---
+>         Validate.notEmpty(nodeName());
+
+
+======================== Jsoup_41 ========================
+****** Correct Fix (right side is the fixed file) ******
+1175c1175
+<         return this == o;
+---
+>         return tag.equals(element.tag);
+
+# Plausible: 5
+# Non-plausible: 16  (can compile)
+# Fail-to-compile: 24
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 2 ************************
+1175c1175
+<         return this == o;
+---
+>         return (this == o) || !(!super.equals(o));
+
+************************ plausible patch: 29 ************************
+1175c1175
+<         return this == o;
+---
+>         return this == firstElementSibling();
+
+************************ plausible patch: 44 ************************
+1167,1176c1167
+<     @Override
+<     public boolean equals(Object o) {
+<         if (this == o) return true;
+<         if (o == null || getClass() != o.getClass()) return false;
+<         if (!super.equals(o)) return false;
+< 
+<         Element element = (Element) o;
+< 
+<         return this == o;
+<     }
+---
+>     
+
+************************ plausible patch: 6 ************************
+1175c1175
+<         return this == o;
+---
+>         return (this == o) || !(getClass() != o.getClass());
+
+************************ plausible patch: 8 ************************
+1175c1175
+<         return this == o;
+---
+>         return this!=o;
+
+
+======================== Jsoup_43 ========================
+****** Correct Fix (right side is the fixed file) ******
+574c574
+<             if (element.equals(search))
+---
+>             if (element == search)
+
+# Plausible: 0
+# Non-plausible: 12  (can compile)
+# Fail-to-compile: 66
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_45 ========================
+****** Correct Fix (right side is the fixed file) ******
+394c394
+<             } else if (("td".equals(name) || "td".equals(name) && !last)) {
+---
+>             } else if (("td".equals(name) || "th".equals(name) && !last)) {
+
+# Plausible: 6
+# Non-plausible: 150  (can compile)
+# Fail-to-compile: 49
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 14 ************************
+394c394
+<             } else if (("td".equals(name) || "td".equals(name) && !last)) {
+---
+>             } else if ((("td".equals(name) || "td".equals(name) && !last)) || !("tbody".equals(name) || "thead".equals(name) || "tfoot".equals(name))) {
+
+************************ plausible patch: 18 ************************
+394c394
+<             } else if (("td".equals(name) || "td".equals(name) && !last)) {
+---
+>             } else if ((("td".equals(name) || "td".equals(name) && !last)) || !("tbody".equals(name))) {
+
+************************ plausible patch: 59 ************************
+394c394
+<             } else if (("td".equals(name) || "td".equals(name) && !last)) {
+---
+>             } else if (last == this.baseUriSetFromDoc || (("td".equals(name) || "td".equals(name) && !last))) {
+
+************************ plausible patch: 67 ************************
+394c394
+<             } else if (("td".equals(name) || "td".equals(name) && !last)) {
+---
+>             } else if (last == this.fosterInserts || (("td".equals(name) || "td".equals(name) && !last))) {
+
+************************ plausible patch: 73 ************************
+394c394
+<             } else if (("td".equals(name) || "td".equals(name) && !last)) {
+---
+>             } else if (("td".equals(name) || "td".equals(name) || !last)) {
+
+************************ plausible patch: 8 ************************
+394c394
+<             } else if (("td".equals(name) || "td".equals(name) && !last)) {
+---
+>             } else if ((("td".equals(name) || "td".equals(name) && !last)) || ("tr".equals(name))) {
+
+
+======================== Jsoup_46 ========================
+****** Correct Fix (right side is the fixed file) ******
+118c118
+<                             accum.append(c);
+---
+>                             accum.append("&#xa0;");
+
+# Plausible: 2
+# Non-plausible: 10  (can compile)
+# Fail-to-compile: 8
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 0 ************************
+115c115
+<                         if (escapeMode != EscapeMode.xhtml)
+---
+>                         if (escapeMode==EscapeMode.xhtml)
+
+************************ plausible patch: 17 ************************
+115,118c115
+<                         if (escapeMode != EscapeMode.xhtml)
+<                             accum.append("&nbsp;");
+<                         else
+<                             accum.append(c);
+---
+>                         accum.append("&nbsp;");
+
+
+======================== Jsoup_47 ========================
+****** Correct Fix (right side is the fixed file) ******
+122c122
+<                         if (!inAttribute)
+---
+>                         if (!inAttribute || escapeMode == EscapeMode.xhtml)
+
+# Plausible: 0
+# Non-plausible: 24  (can compile)
+# Fail-to-compile: 2
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_49 ========================
+****** Correct Fix (right side is the fixed file) ******
+444a445
+>             reindexChildren(index);
+446d446
+<         reindexChildren(index);
+
+# Plausible: 1
+# Non-plausible: 54  (can compile)
+# Fail-to-compile: 99
+# Timeout: 22  (timeout threshold is set to 180s)
+
+************************ plausible patch: 112 ************************
+444a445
+> 	reindexChildren(index);
+
+
+======================== Jsoup_51 ========================
+****** Correct Fix (right side is the fixed file) ******
+300c300
+<         return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+---
+>         return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || Character.isLetter(c);
+
+# Plausible: 2
+# Non-plausible: 90  (can compile)
+# Fail-to-compile: 80
+# Timeout: 53  (timeout threshold is set to 180s)
+
+************************ plausible patch: 122 ************************
+300c300
+<         return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+---
+>         return (c >= 'A' && c!='Z') || (c >= 'a' && c <= 'z');
+
+************************ plausible patch: 132 ************************
+300c300
+<         return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+---
+>         return (c >= 'A' && c <= 'Z') || (c >= 'a' && c!='z');
+
+
+======================== Jsoup_54 ========================
+****** Correct Fix (right side is the fixed file) ******
+125a126
+>                 if (key.matches("[a-zA-Z_:]{1}[-a-zA-Z0-9_:.]*"))
+
+# Plausible: 0
+# Non-plausible: 4  (can compile)
+# Fail-to-compile: 10
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_55 ========================
+****** Correct Fix (right side is the fixed file) ******
+882a883
+>                     r.unconsume();
+
+# Plausible: 0
+# Non-plausible: 4  (can compile)
+# Fail-to-compile: 4
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_57 ========================
+****** Correct Fix (right side is the fixed file) ******
+125c125
+<                 attributes.remove(attrKey);
+---
+>                 it.remove();
+
+# Plausible: 0
+# Non-plausible: 58  (can compile)
+# Fail-to-compile: 13
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_61 ========================
+****** Correct Fix (right side is the fixed file) ******
+1092c1092
+<         final String classAttr = attributes.get("class");
+---
+>         final String classAttr = attributes.getIgnoreCase("class");
+
+# Plausible: 1
+# Non-plausible: 5  (can compile)
+# Fail-to-compile: 11
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 12 ************************
+1092c1092
+<         final String classAttr = attributes.get("class");
+---
+>         final String classAttr = attributes.getIgnoreCase("class");
+
+
+======================== Jsoup_62 ========================
+****** Correct Fix (right side is the fixed file) ******
+764c764
+<             String name = t.asEndTag().normalName();
+---
+>             String name = t.asEndTag().name(); // matches with case sensitivity if enabled
+
+# Plausible: 0
+# Non-plausible: 3  (can compile)
+# Fail-to-compile: 4
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_64 ========================
+****** Correct Fix (right side is the fixed file) ******
+1489d1488
+<         tb.insert(startTag);
+1492a1492
+>         tb.insert(startTag);
+
+# Plausible: 3
+# Non-plausible: 21  (can compile)
+# Fail-to-compile: 4
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 10 ************************
+1489c1489
+<         tb.insert(startTag);
+---
+>         
+1491a1492,1493
+> 	tb.insert(startTag);
+> 
+
+************************ plausible patch: 11 ************************
+1489c1489
+<         tb.insert(startTag);
+---
+>         
+1492a1493,1494
+> 	tb.insert(startTag);
+> 
+
+************************ plausible patch: 9 ************************
+1489c1489
+<         tb.insert(startTag);
+---
+>         
+1490a1491,1492
+> 	tb.insert(startTag);
+> 
+
+
+======================== Jsoup_76 ========================
+****** Correct Fix (right side is the fixed file) ******
+381a382
+>                         tb.reader.matchConsume("\n"); // ignore LF if next token
+
+# Plausible: 0
+# Non-plausible: 11  (can compile)
+# Fail-to-compile: 2
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_77 ========================
+****** Correct Fix (right side is the fixed file) ******
+117c117
+<         String elName = endTag.name();
+---
+>         String elName = endTag.normalName();
+
+# Plausible: 0
+# Non-plausible: 4  (can compile)
+# Fail-to-compile: 6
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_86 ========================
+****** Correct Fix (right side is the fixed file) ******
+78c78
+<         if (doc.childNodeSize() > 0) {
+---
+>         if (doc.children().size() > 0) {
+
+# Plausible: 0
+# Non-plausible: 14  (can compile)
+# Fail-to-compile: 48
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_88 ========================
+****** Correct Fix (right side is the fixed file) ******
+80c80
+<         return val;
+---
+>         return Attributes.checkNotNull(val);
+
+# Plausible: 2
+# Non-plausible: 9  (can compile)
+# Fail-to-compile: 6
+# Timeout: 0  (timeout threshold is set to 180s)
+
+************************ plausible patch: 13 ************************
+80c80,81
+<         return val;
+---
+>         if (val == null) val = new String();
+>  return val;
+
+************************ plausible patch: 14 ************************
+80c80,81
+<         return val;
+---
+>         if (val == null) return new String();
+> 	 return val;
+
+
+======================== Jsoup_9 ========================
+****** Correct Fix (right side is the fixed file) ******
+38c38
+<     private static final Pattern unescapePattern = Pattern.compile("&(#(x|X)?([0-9a-fA-F]+)|[a-zA-Z]+);?");
+---
+>     private static final Pattern unescapePattern = Pattern.compile("&(#(x|X)?([0-9a-fA-F]+)|[a-zA-Z]+\\d*);?");
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 1
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== Jsoup_93 ========================
+****** Correct Fix (right side is the fixed file) ******
+88a89
+>             if (type.equalsIgnoreCase("button")) continue; // browsers don't submit these
+
+# Plausible: 0
+# Non-plausible: 0  (can compile)
+# Fail-to-compile: 0
+# Timeout: 0  (timeout threshold is set to 180s)
+
+
+======================== JxPath_10 ========================
+****** Correct Fix (right side is the fixed file) ******
+42c42
+<         return compute(args[0].computeValue(context), args[1].computeValue(context)) 
+---
+>         return compute(args[0].compute(context), args[1].compute(context))
+
+# Plausible: 0
+# Non-plausible: 16  (can compile)
+# Fail-to-compile: 23
+# Timeout: 0  (timeout threshold is set to 180s)
+
