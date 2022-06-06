@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.lu.uni.serval.tbar.main.Main;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,7 +253,14 @@ public abstract class AbstractFixer implements IFixer {
 	
 	protected void testGeneratedPatches(List<Patch> patchCandidates, SuspCodeNode scn) {
 		// Testing generated patches.
+		JSONArray patchesInfo = new JSONArray();
 		for (Patch patch : patchCandidates) {
+			JSONObject patchInfo = new JSONObject();
+			patchInfo.put("patchId", patchId);
+			patchInfo.put("targetJavaFilePath", scn.targetJavaFile.getPath());
+			patchInfo.put("startPos", scn.startPos);
+			patchInfo.put("endPos", scn.endPos);
+			patchInfo.put("suspCodeStr", scn.suspCodeStr);
 			patch.buggyFileName = scn.suspiciousJavaFile;
 			addPatchCodeToFile(scn, patch);// Insert the patch.
 			if (this.triedPatchCandidates.contains(patch)) continue;
@@ -272,6 +282,9 @@ public abstract class AbstractFixer implements IFixer {
 			} catch (IOException e) {
 				log.debug(buggyProject + " ---Fixer: fix fail because of javac exception! ");
 				Long timeAfterCompile = System.currentTimeMillis();
+				patchInfo.put("compilable", false);
+				patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
+				patchesInfo.put(patchInfo);
 				log.info(String.format("= Patch %d failed to compile in %d ms =", patchId, timeAfterCompile-timeBeforeCompile));
 				continue;
 			}
@@ -280,12 +293,19 @@ public abstract class AbstractFixer implements IFixer {
 				if (results == 1) {
 					log.debug(buggyProject + " ---Fixer: fix fail because of failed compiling! ");
 					Long timeAfterCompile = System.currentTimeMillis();
+					patchInfo.put("compilable", false);
+					patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
+					patchesInfo.put(patchInfo);
 					log.info(String.format("= Patch %d failed to compile in %d ms =", patchId, timeAfterCompile-timeBeforeCompile));
 					continue;
 				}
 			}
 			log.debug("Finish of compiling.");
 			Long timeAfterCompile = System.currentTimeMillis();
+			patchInfo.put("compilable", true);
+			patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
+			patchInfo.put("patchPoolId", patchInPoolId);
+			patchesInfo.put(patchInfo);
 			log.info(String.format("= Compilable patch %d compiled in %d ms (patch-pool id: %d) =", patchId, timeAfterCompile-timeBeforeCompile, patchInPoolId));
 			comparablePatches++;
 
@@ -391,6 +411,8 @@ public abstract class AbstractFixer implements IFixer {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+
+		Main.currentStmtInfo.put("patches", patchesInfo);
 	}
 
 	private void outputUniaprStylePatch(SuspCodeNode scn){

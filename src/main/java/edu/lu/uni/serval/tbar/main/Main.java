@@ -1,10 +1,19 @@
 package edu.lu.uni.serval.tbar.main;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import edu.lu.uni.serval.tbar.AbstractFixer;
 import edu.lu.uni.serval.tbar.TBarFixer;
 import edu.lu.uni.serval.tbar.config.Configuration;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONWriter;
 
 /**
  * Fix bugs with Fault Localization results.
@@ -13,7 +22,10 @@ import edu.lu.uni.serval.tbar.config.Configuration;
  *
  */
 public class Main {
-	
+
+	public static JSONArray susStmtInfoArr = new JSONArray();
+	public static JSONObject currentStmtInfo = new JSONObject();
+
 	public static void main(String[] args) {
 		if (args.length != 3) {
 			System.err.println("Arguments: \n" 
@@ -58,7 +70,13 @@ public class Main {
 
 
 		System.out.println("Patch generation for " + bugIdStr + " is done.");
-
+		try(FileWriter writer = new FileWriter("patches/" + bugIdStr + "/patches-pool/patches.info", false)){
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonElement je = JsonParser.parseString(Main.susStmtInfoArr.toString());
+			writer.write(gson.toJson(je));
+		} catch (Throwable t){
+			t.printStackTrace();
+		}
 		/* No patch validation, only generation */
 //		int fixedStatus = fixer.fixedStatus;
 //		switch (fixedStatus) {

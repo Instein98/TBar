@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.lu.uni.serval.tbar.main.Main;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,37 +85,45 @@ public class TBarFixer extends AbstractFixer {
 		List<SuspCodeNode> triedSuspNode = new ArrayList<>();
 		log.info("=======TBar: Start to fix suspicious code======");
 		for (SuspiciousPosition suspiciousCode : suspiciousCodeList) {
-			Long startTime = System.currentTimeMillis();
-			List<SuspCodeNode> scns = parseSuspiciousCode(suspiciousCode);
-			Long timeAfterParse = System.currentTimeMillis();
-			log.info(String.format("= Parse %s:%d %d ms =", suspiciousCode.classPath, suspiciousCode.lineNumber, timeAfterParse - startTime));
-			if (scns == null) continue;
+			try {
+				Main.currentStmtInfo = new JSONObject();
+				Main.currentStmtInfo.put("stmtLocation", suspiciousCode.classPath + ":" + suspiciousCode.lineNumber);
+				Long startTime = System.currentTimeMillis();
+				List<SuspCodeNode> scns = parseSuspiciousCode(suspiciousCode);
+				Long timeAfterParse = System.currentTimeMillis();
+				Main.currentStmtInfo.put("parseSuspCodeNodeTimeMs", timeAfterParse - startTime);
+				Main.currentStmtInfo.put("#suspCodeNode", scns == null ? 0 : scns.size());
+				log.info(String.format("= Parse %s:%d %d ms =", suspiciousCode.classPath, suspiciousCode.lineNumber, timeAfterParse - startTime));
+				if (scns == null) continue;
 
-			for (SuspCodeNode scn : scns) {
-//				log.debug(scn.suspCodeStr);
-				if (triedSuspNode.contains(scn)) continue;
-				triedSuspNode.add(scn);
-				
-				// Parse context information of the suspicious code.
-				List<Integer> contextInfoList = readAllNodeTypes(scn.suspCodeAstNode);
-				List<Integer> distinctContextInfo = new ArrayList<>();
-				for (Integer contInfo : contextInfoList) {
-					if (!distinctContextInfo.contains(contInfo) && !Checker.isBlock(contInfo)) {
-						distinctContextInfo.add(contInfo);
+				for (SuspCodeNode scn : scns) {
+					//				log.debug(scn.suspCodeStr);
+					if (triedSuspNode.contains(scn)) continue;
+					triedSuspNode.add(scn);
+
+					// Parse context information of the suspicious code.
+					List<Integer> contextInfoList = readAllNodeTypes(scn.suspCodeAstNode);
+					List<Integer> distinctContextInfo = new ArrayList<>();
+					for (Integer contInfo : contextInfoList) {
+						if (!distinctContextInfo.contains(contInfo) && !Checker.isBlock(contInfo)) {
+							distinctContextInfo.add(contInfo);
+						}
 					}
-				}
-//				List<Integer> distinctContextInfo = contextInfoList.stream().distinct().collect(Collectors.toList());
-				
-		        // Match fix templates for this suspicious code with its context information.
-				fixWithMatchedFixTemplates(scn, distinctContextInfo);
+					//				List<Integer> distinctContextInfo = contextInfoList.stream().distinct().collect(Collectors.toList());
 
+					// Match fix templates for this suspicious code with its context information.
+					fixWithMatchedFixTemplates(scn, distinctContextInfo);
+
+					/* Now we want to exhaustively generate all possible patches */
+					//				if (!isTestFixPatterns && minErrorTest == 0) break;
+					if (this.patchId >= 10000) break;
+				}
 				/* Now we want to exhaustively generate all possible patches */
-//				if (!isTestFixPatterns && minErrorTest == 0) break;
+				//			if (!isTestFixPatterns && minErrorTest == 0) break;
 				if (this.patchId >= 10000) break;
+			} finally {
+				Main.susStmtInfoArr.put(Main.currentStmtInfo);
 			}
-			/* Now we want to exhaustively generate all possible patches */
-//			if (!isTestFixPatterns && minErrorTest == 0) break;
-			if (this.patchId >= 10000) break;
         }
 		log.info("=======TBar: Finish off fixing======");
 		
@@ -503,10 +513,13 @@ public class TBarFixer extends AbstractFixer {
 		ft.generatePatches();
 		List<Patch> patchCandidates = ft.getPatches();
 //		System.out.println(dataType + " ====== " + patchCandidates.size());
-		
+
+		Long timeAfterPatchGeneration = System.currentTimeMillis();
+		Main.currentStmtInfo.put("#patchesGenerated", patchCandidates.size());
+		Main.currentStmtInfo.put("patchesGenerationTimeMs", timeAfterPatchGeneration - timeBeforePatchGeneration);
+
 		// Test generated patches.
 		if (patchCandidates.isEmpty()) return;
-		Long timeAfterPatchGeneration = System.currentTimeMillis();
 		log.info(String.format("= Generate %d patches in %d ms =", patchCandidates.size(), timeAfterPatchGeneration - timeBeforePatchGeneration));
 		testGeneratedPatches(patchCandidates, scn);
 	}
