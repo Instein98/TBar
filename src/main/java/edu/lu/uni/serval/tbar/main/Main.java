@@ -55,19 +55,23 @@ public class Main {
 		}
 		
 		fixer.fixProcess();
-		
-		int fixedStatus = fixer.fixedStatus;
-		switch (fixedStatus) {
-		case 0:
-			System.out.println("Failed to fix bug " + bugIdStr);
-			break;
-		case 1:
-			System.out.println("Succeeded to fix bug " + bugIdStr);
-			break;
-		case 2:
-			System.out.println("Partial succeeded to fix bug " + bugIdStr);
-			break;
-		}
+
+
+		System.out.println("Patch generation for " + bugIdStr + " is done.");
+
+		/* No patch validation, only generation */
+//		int fixedStatus = fixer.fixedStatus;
+//		switch (fixedStatus) {
+//		case 0:
+//			System.out.println("Failed to fix bug " + bugIdStr);
+//			break;
+//		case 1:
+//			System.out.println("Succeeded to fix bug " + bugIdStr);
+//			break;
+//		case 2:
+//			System.out.println("Partial succeeded to fix bug " + bugIdStr);
+//			break;
+//		}
 	}
 
 }

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +39,7 @@ import edu.lu.uni.serval.tbar.utils.TestUtils;
 public abstract class AbstractFixer implements IFixer {
 	
 	private static Logger log = LoggerFactory.getLogger(AbstractFixer.class);
+	private static int patchInPoolId = 0;
 	
 	public String metric = "Ochiai";          // Fault localization metric.
 	protected String path = "";
@@ -71,7 +74,7 @@ public abstract class AbstractFixer implements IFixer {
 	public AbstractFixer(String path, String projectName, int bugId, String defects4jPath) {
 		this.path = path;
 		this.buggyProject = projectName + "_" + bugId;
-		fullBuggyProjectPath = path + buggyProject;
+		fullBuggyProjectPath = Paths.get(path).resolve(buggyProject).toString();
 		this.defects4jPath = defects4jPath;
 //		int compileResult = TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, this.defects4jPath);
 //      if (compileResult == 1) {
@@ -82,19 +85,21 @@ public abstract class AbstractFixer implements IFixer {
 //		if (FileHelper.getAllFiles(fullBuggyProjectPath + PathUtils.getSrcPath(buggyProject).get(0), ".class").isEmpty()) {
 			TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath);
 //		}
-		minErrorTest = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, defects4jPath, failedTestStrList);
-		if (minErrorTest == Integer.MAX_VALUE) {
-			TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath);
-			minErrorTest = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, defects4jPath, failedTestStrList);
-		}
-		log.info(buggyProject + " Failed Tests: " + this.minErrorTest);
-		minErrorTest_ = minErrorTest;
+
+		/* I don't want to run tests before generating patches */
+//		minErrorTest = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, defects4jPath, failedTestStrList);
+//		if (minErrorTest == Integer.MAX_VALUE) {
+//			TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath);
+//			minErrorTest = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, defects4jPath, failedTestStrList);
+//		}
+//		log.info(buggyProject + " Failed Tests: " + this.minErrorTest);
+//		minErrorTest_ = minErrorTest;
 		
 		// Read paths of the buggy project.
 		this.dp = new DataPreparer(path);
 		dp.prepareData(buggyProject);
 		
-		readPreviouslyFailedTestCases();
+//		readPreviouslyFailedTestCases();
 		
 //		createDictionary();
 	}
@@ -259,113 +264,123 @@ public abstract class AbstractFixer implements IFixer {
 			scn.targetClassFile.delete();
 
 			log.debug("Compiling");
+			Long timeBeforeCompile = System.currentTimeMillis();
 			try {// Compile patched file.
 				ShellUtils.shellRun(Arrays.asList("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
 						+ PathUtils.buildCompileClassPath(Arrays.asList(PathUtils.getJunitPath()), dp.classPath, dp.testClassPath)
 						+ " -d " + dp.classPath + " " + scn.targetJavaFile.getAbsolutePath()), buggyProject, 1);
 			} catch (IOException e) {
 				log.debug(buggyProject + " ---Fixer: fix fail because of javac exception! ");
+				Long timeAfterCompile = System.currentTimeMillis();
+				log.info(String.format("= Patch %d failed to compile in %d ms =", patchId, timeAfterCompile-timeBeforeCompile));
 				continue;
 			}
 			if (!scn.targetClassFile.exists()) { // fail to compile
 				int results = (this.buggyProject.startsWith("Mockito") || this.buggyProject.startsWith("Closure") || this.buggyProject.startsWith("Time")) ? TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath) : 1;
 				if (results == 1) {
 					log.debug(buggyProject + " ---Fixer: fix fail because of failed compiling! ");
+					Long timeAfterCompile = System.currentTimeMillis();
+					log.info(String.format("= Patch %d failed to compile in %d ms =", patchId, timeAfterCompile-timeBeforeCompile));
 					continue;
 				}
 			}
 			log.debug("Finish of compiling.");
+			Long timeAfterCompile = System.currentTimeMillis();
+			log.info(String.format("= Compilable patch %d compiled in %d ms (patch-pool id: %d) =", patchId, timeAfterCompile-timeBeforeCompile, patchInPoolId));
 			comparablePatches++;
-			
-			log.debug("Test previously failed test cases.");
-			try {
-				String results = ShellUtils.shellRun(Arrays.asList("java -cp "
-						+ PathUtils.buildTestClassPath(dp.classPath, dp.testClassPath)
-						+ " org.junit.runner.JUnitCore " + this.failedTestCaseClasses), buggyProject, 2);
 
-				if (results.isEmpty()) {
-//					System.err.println(scn.suspiciousJavaFile + "@" + scn.buggyLine);
-//					System.err.println("Bug: " + buggyCode);
-//					System.err.println("Patch: " + patchCode);
-					continue;
-				} else {
-					if (!results.contains("java.lang.NoClassDefFoundError")) {
-						List<String> tempFailedTestCases = readTestResults(results);
-						tempFailedTestCases.retainAll(this.fakeFailedTestCasesList);
-						if (!tempFailedTestCases.isEmpty()) {
-							if (this.failedTestCasesStrList.size() == 1) continue;
+			/* No validation, just output the patch! */
+			outputUniaprStylePatch(scn);
 
-							// Might be partially fixed.
-							tempFailedTestCases.removeAll(this.failedTestCasesStrList);
-							if (!tempFailedTestCases.isEmpty()) continue; // Generate new bugs.
-						}
-					}
-				}
-			} catch (IOException e) {
-				if (!(this.buggyProject.startsWith("Mockito") || this.buggyProject.startsWith("Closure") || this.buggyProject.startsWith("Time"))) {
-					log.debug(buggyProject + " ---Fixer: fix fail because of faile passing previously failed test cases! ");
-					continue;
-				}
-			}
-
-			List<String> failedTestsAfterFix = new ArrayList<>();
-			int errorTestAfterFix = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, this.defects4jPath,
-					failedTestsAfterFix);
-			failedTestsAfterFix.removeAll(this.fakeFailedTestCasesList);
-			
-			if (errorTestAfterFix < minErrorTest) {
-				List<String> tmpFailedTestsAfterFix = new ArrayList<>();
-				tmpFailedTestsAfterFix.addAll(failedTestsAfterFix);
-				tmpFailedTestsAfterFix.removeAll(this.failedTestStrList);
-				if (tmpFailedTestsAfterFix.size() > 0) { // Generate new bugs.
-					log.debug(buggyProject + " ---Generated new bugs: " + tmpFailedTestsAfterFix.size());
-					continue;
-				}
-				
-				// Output the generated patch.
-				if (errorTestAfterFix == 0 || failedTestsAfterFix.isEmpty()) {
-					fixedStatus = 1;
-					log.info("Succeeded to fix the bug " + buggyProject + "====================");
-					String patchStr = TestUtils.readPatch(this.fullBuggyProjectPath);
-					System.out.println(patchStr);
-					if (patchStr == null || !patchStr.startsWith("diff")) {
-						FileHelper.outputToFile(Configuration.outputPath + this.dataType + "/FixedBugs/" + buggyProject + "/Patch_" + patchId + "_" + comparablePatches + ".txt",
-								"//**********************************************************\n//" + scn.suspiciousJavaFile + " ------ " + scn.buggyLine
-								+ "\n//**********************************************************\n"
-								+ "===Buggy Code===\n" + buggyCode + "\n\n===Patch Code===\n" + patchCode, false);
-					} else {
-						FileHelper.outputToFile(Configuration.outputPath + this.dataType + "/FixedBugs/" + buggyProject + "/Patch_" + patchId + "_" + comparablePatches + ".txt", patchStr, false);
-					}
-					
-					if (!isTestFixPatterns) {
-						this.minErrorTest = 0;
-						break;
-					}
-				} else {
-					if (minErrorTestAfterFix == 0 || errorTestAfterFix <= minErrorTestAfterFix) {
-						minErrorTestAfterFix = errorTestAfterFix;
-						fixedStatus = 2;
-						minErrorTest_ = minErrorTest_ - (minErrorTest - errorTestAfterFix);
-						if (minErrorTest_ <= 0) {
-							fixedStatus = 1;
-							minErrorTest = 0;
-						}
-						log.info("Partially Succeeded to fix the bug " + buggyProject + "====================");
-						String patchStr = TestUtils.readPatch(this.fullBuggyProjectPath);
-						if (patchStr == null || !patchStr.startsWith("diff")) {
-							FileHelper.outputToFile(Configuration.outputPath + this.dataType + "/PartiallyFixedBugs/" + buggyProject + "/Patch_" + patchId + "_" + comparablePatches + ".txt",
-									"//**********************************************************\n//" + scn.suspiciousJavaFile + " ------ " + scn.buggyLine
-									+ "\n//**********************************************************\n"
-									+ "===Buggy Code===\n" + buggyCode + "\n\n===Patch Code===\n" + patchCode, false);
-						} else {
-							FileHelper.outputToFile(Configuration.outputPath + this.dataType + "/PartiallyFixedBugs/" + buggyProject + "/Patch_" + patchId + "_" + comparablePatches + ".txt", patchStr, false);
-						}
-						break;
-					}
-				}
-			} else {
-				log.debug("Failed Tests after fixing: " + errorTestAfterFix + " " + buggyProject);
-			}
+//			log.debug("Test previously failed test cases.");
+//			try {
+//				String results = ShellUtils.shellRun(Arrays.asList("java -cp "
+//						+ PathUtils.buildTestClassPath(dp.classPath, dp.testClassPath)
+//						+ " org.junit.runner.JUnitCore " + this.failedTestCaseClasses), buggyProject, 2);
+//
+//				if (results.isEmpty()) {
+////					System.err.println(scn.suspiciousJavaFile + "@" + scn.buggyLine);
+////					System.err.println("Bug: " + buggyCode);
+////					System.err.println("Patch: " + patchCode);
+//					continue;
+//				} else {
+//					if (!results.contains("java.lang.NoClassDefFoundError")) {
+//						List<String> tempFailedTestCases = readTestResults(results);
+//						tempFailedTestCases.retainAll(this.fakeFailedTestCasesList);
+//						if (!tempFailedTestCases.isEmpty()) {
+//							if (this.failedTestCasesStrList.size() == 1) continue;
+//
+//							// Might be partially fixed.
+//							tempFailedTestCases.removeAll(this.failedTestCasesStrList);
+//							if (!tempFailedTestCases.isEmpty()) continue; // Generate new bugs.
+//						}
+//					}
+//				}
+//			} catch (IOException e) {
+//				if (!(this.buggyProject.startsWith("Mockito") || this.buggyProject.startsWith("Closure") || this.buggyProject.startsWith("Time"))) {
+//					log.debug(buggyProject + " ---Fixer: fix fail because of faile passing previously failed test cases! ");
+//					continue;
+//				}
+//			}
+//
+//			List<String> failedTestsAfterFix = new ArrayList<>();
+//			int errorTestAfterFix = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, this.defects4jPath,
+//					failedTestsAfterFix);
+//			failedTestsAfterFix.removeAll(this.fakeFailedTestCasesList);
+//
+//			if (errorTestAfterFix < minErrorTest) {
+//				List<String> tmpFailedTestsAfterFix = new ArrayList<>();
+//				tmpFailedTestsAfterFix.addAll(failedTestsAfterFix);
+//				tmpFailedTestsAfterFix.removeAll(this.failedTestStrList);
+//				if (tmpFailedTestsAfterFix.size() > 0) { // Generate new bugs.
+//					log.debug(buggyProject + " ---Generated new bugs: " + tmpFailedTestsAfterFix.size());
+//					continue;
+//				}
+//
+//				// Output the generated patch.
+//				if (errorTestAfterFix == 0 || failedTestsAfterFix.isEmpty()) {
+//					fixedStatus = 1;
+//					log.info("Succeeded to fix the bug " + buggyProject + "====================");
+//					String patchStr = TestUtils.readPatch(this.fullBuggyProjectPath);
+//					System.out.println(patchStr);
+//					if (patchStr == null || !patchStr.startsWith("diff")) {
+//						FileHelper.outputToFile(Configuration.outputPath + this.dataType + "/FixedBugs/" + buggyProject + "/Patch_" + patchId + "_" + comparablePatches + ".txt",
+//								"//**********************************************************\n//" + scn.suspiciousJavaFile + " ------ " + scn.buggyLine
+//								+ "\n//**********************************************************\n"
+//								+ "===Buggy Code===\n" + buggyCode + "\n\n===Patch Code===\n" + patchCode, false);
+//					} else {
+//						FileHelper.outputToFile(Configuration.outputPath + this.dataType + "/FixedBugs/" + buggyProject + "/Patch_" + patchId + "_" + comparablePatches + ".txt", patchStr, false);
+//					}
+//
+//					if (!isTestFixPatterns) {
+//						this.minErrorTest = 0;
+//						break;
+//					}
+//				} else {
+//					if (minErrorTestAfterFix == 0 || errorTestAfterFix <= minErrorTestAfterFix) {
+//						minErrorTestAfterFix = errorTestAfterFix;
+//						fixedStatus = 2;
+//						minErrorTest_ = minErrorTest_ - (minErrorTest - errorTestAfterFix);
+//						if (minErrorTest_ <= 0) {
+//							fixedStatus = 1;
+//							minErrorTest = 0;
+//						}
+//						log.info("Partially Succeeded to fix the bug " + buggyProject + "====================");
+//						String patchStr = TestUtils.readPatch(this.fullBuggyProjectPath);
+//						if (patchStr == null || !patchStr.startsWith("diff")) {
+//							FileHelper.outputToFile(Configuration.outputPath + this.dataType + "/PartiallyFixedBugs/" + buggyProject + "/Patch_" + patchId + "_" + comparablePatches + ".txt",
+//									"//**********************************************************\n//" + scn.suspiciousJavaFile + " ------ " + scn.buggyLine
+//									+ "\n//**********************************************************\n"
+//									+ "===Buggy Code===\n" + buggyCode + "\n\n===Patch Code===\n" + patchCode, false);
+//						} else {
+//							FileHelper.outputToFile(Configuration.outputPath + this.dataType + "/PartiallyFixedBugs/" + buggyProject + "/Patch_" + patchId + "_" + comparablePatches + ".txt", patchStr, false);
+//						}
+//						break;
+//					}
+//				}
+//			} else {
+//				log.debug("Failed Tests after fixing: " + errorTestAfterFix + " " + buggyProject);
+//			}
 		}
 		
 		try {
@@ -377,7 +392,25 @@ public abstract class AbstractFixer implements IFixer {
 			e1.printStackTrace();
 		}
 	}
-	
+
+	private void outputUniaprStylePatch(SuspCodeNode scn){
+		int curIdx = patchInPoolId++;
+		String commonPrefix = scn.suspiciousJavaFile.substring(0, scn.suspiciousJavaFile.length()-5);
+		String patchedSourceFilePath = "patches/" + buggyProject + "/patches-pool/" + curIdx + "/" + commonPrefix + ".java";
+		String patchedClassFilePath = "patches/" + buggyProject + "/patches-pool/" + curIdx + "/" + commonPrefix + ".class";
+		File patchedSourceFile = new File(patchedSourceFilePath);
+		File patchedClassFile = new File(patchedClassFilePath);
+		if (!patchedSourceFile.getParentFile().exists()){
+			patchedSourceFile.getParentFile().mkdirs();
+		}
+		try{
+			Files.copy(scn.targetJavaFile.toPath(), patchedSourceFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(scn.targetClassFile.toPath(), patchedClassFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (Throwable t){
+			t.printStackTrace();
+		}
+	}
+
 	private List<String> readTestResults(String results) {
 		List<String> failedTeatCases = new ArrayList<>();
 		String[] testResults = results.split("\n");

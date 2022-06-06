@@ -83,7 +83,10 @@ public class TBarFixer extends AbstractFixer {
 		List<SuspCodeNode> triedSuspNode = new ArrayList<>();
 		log.info("=======TBar: Start to fix suspicious code======");
 		for (SuspiciousPosition suspiciousCode : suspiciousCodeList) {
+			Long startTime = System.currentTimeMillis();
 			List<SuspCodeNode> scns = parseSuspiciousCode(suspiciousCode);
+			Long timeAfterParse = System.currentTimeMillis();
+			log.info(String.format("= Parse %s:%d %d ms =", suspiciousCode.classPath, suspiciousCode.lineNumber, timeAfterParse - startTime));
 			if (scns == null) continue;
 
 			for (SuspCodeNode scn : scns) {
@@ -103,11 +106,13 @@ public class TBarFixer extends AbstractFixer {
 				
 		        // Match fix templates for this suspicious code with its context information.
 				fixWithMatchedFixTemplates(scn, distinctContextInfo);
-		        
-				if (!isTestFixPatterns && minErrorTest == 0) break;
+
+				/* Now we want to exhaustively generate all possible patches */
+//				if (!isTestFixPatterns && minErrorTest == 0) break;
 				if (this.patchId >= 10000) break;
 			}
-			if (!isTestFixPatterns && minErrorTest == 0) break;
+			/* Now we want to exhaustively generate all possible patches */
+//			if (!isTestFixPatterns && minErrorTest == 0) break;
 			if (this.patchId >= 10000) break;
         }
 		log.info("=======TBar: Finish off fixing======");
@@ -489,6 +494,7 @@ public class TBarFixer extends AbstractFixer {
 	}
 	
 	protected void generateAndValidatePatches(FixTemplate ft, SuspCodeNode scn) {
+		Long timeBeforePatchGeneration = System.currentTimeMillis();
 		ft.setSuspiciousCodeStr(scn.suspCodeStr);
 		ft.setSuspiciousCodeTree(scn.suspCodeAstNode);
 		if (scn.javaBackup == null) ft.setSourceCodePath(dp.srcPath);
@@ -500,6 +506,8 @@ public class TBarFixer extends AbstractFixer {
 		
 		// Test generated patches.
 		if (patchCandidates.isEmpty()) return;
+		Long timeAfterPatchGeneration = System.currentTimeMillis();
+		log.info(String.format("= Generate %d patches in %d ms =", patchCandidates.size(), timeAfterPatchGeneration - timeBeforePatchGeneration));
 		testGeneratedPatches(patchCandidates, scn);
 	}
 	

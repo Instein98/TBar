@@ -81,7 +81,7 @@ public class TestUtils {
 		try {
 			String buggyProject = projectName.substring(projectName.lastIndexOf("/") + 1);
 			//which java\njava -version\n
-            String result = ShellUtils.shellRun(Arrays.asList("cd " + projectName + "\n", defects4jPath + "framework/bin/defects4j " + cmdType + "\n"), buggyProject, cmdType.equals("test") ? 2 : 1);//"defects4j " + cmdType + "\n"));//
+            String result = ShellUtils.shellRun(Arrays.asList("cd " + projectName + "\n", defects4jPath + "/framework/bin/defects4j " + cmdType + "\n"), buggyProject, cmdType.equals("test") ? 2 : 1);//"defects4j " + cmdType + "\n"));//
             return result.trim();
         } catch (IOException e){
         	e.printStackTrace();
