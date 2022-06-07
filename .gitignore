@@ -3,3 +3,11 @@
 .settings/
 logs/
 .DS_Store
+.temp
+target
+patches
+*.log
+D4J/projects/*
+!D4J/projects/Chart_8.zip
+!D4J/projects/README.md
+!D4J/README.md

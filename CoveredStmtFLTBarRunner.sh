@@ -23,6 +23,9 @@ for PID in "${PID_list[@]}"; do
     if [ -f patches/"$PID"_"$BID"/patches-pool/patches.info ]; then
       echo "patches.info already exists, skip $PID-$BID"
       continue
+    elif [ -d patches/"$PID"_"$BID" ]; then
+      echo "Incomplete patches pool for $PID-$BID, delete"
+      rm -rf patches/"$PID"_"$BID"
     fi
     echo ====================================================
     echo "                     $PID $BID                      "
