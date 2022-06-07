@@ -44,7 +44,7 @@ public abstract class AbstractFixer implements IFixer {
 	private static Logger log = LoggerFactory.getLogger(AbstractFixer.class);
 	private static int patchInPoolId = 0;
 	
-	public String metric = "Ochiai";          // Fault localization metric.
+	public String metric = "Covered";          // Fault localization metric.
 	protected String path = "";
 	protected String buggyProject = "";     // The buggy project name.
 	protected String defects4jPath;         // The path of local installed defects4j.

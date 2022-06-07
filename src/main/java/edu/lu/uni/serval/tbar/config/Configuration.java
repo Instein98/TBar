@@ -5,7 +5,7 @@ public class Configuration {
 	public static String knownBugPositions = "BugPositions.txt";
 	public static String suspPositionsFilePath = "SuspiciousCodePositions/";
 	public static String failedTestCasesFilePath = "FailedTestCases/";
-	public static String faultLocalizationMetric = "Ochiai";
+	public static String faultLocalizationMetric = "Covered";
 	public static String outputPath = "OUTPUT/";
 
 	public static final String TEMP_FILES_PATH = ".temp/";

@@ -1,0 +1,15 @@
+org.apache.commons.lang3.text.translate.EntityArraysTest@48
+org.apache.commons.lang3.text.translate.EntityArraysTest@57
+org.apache.commons.lang3.text.translate.EntityArraysTest@51
+org.apache.commons.lang3.text.translate.EntityArraysTest@54
+org.apache.commons.lang3.text.translate.EntityArraysTest@49
+org.apache.commons.lang3.text.translate.EntityArraysTest@64
+org.apache.commons.lang3.text.translate.EntityArrays@30
+org.apache.commons.lang3.text.translate.EntityArraysTest@55
+org.apache.commons.lang3.text.translate.EntityArraysTest@29
+org.apache.commons.lang3.text.translate.EntityArraysTest@52
+org.apache.commons.lang3.text.translate.EntityArraysTest@50
+org.apache.commons.lang3.text.translate.EntityArraysTest@59
+org.apache.commons.lang3.text.translate.EntityArraysTest@65
+org.apache.commons.lang3.text.translate.EntityArraysTest@53
+org.apache.commons.lang3.text.translate.EntityArraysTest@56

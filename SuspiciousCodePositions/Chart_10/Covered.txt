@@ -1,0 +1,12 @@
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@79
+org.jfree.chart.imagemap.StandardToolTipTagFragmentGenerator@55
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@81
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@78
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@70
+org.jfree.chart.imagemap.StandardToolTipTagFragmentGenerator@54
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@82
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@69
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@80
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@60
+org.jfree.chart.imagemap.junit.StandardToolTipTagFragmentGeneratorTests@76
+org.jfree.chart.imagemap.StandardToolTipTagFragmentGenerator@65
