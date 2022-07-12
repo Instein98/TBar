@@ -20,6 +20,12 @@ for PID in "${PID_list[@]}"; do
   fi
 
   for BID in "${BID_list[@]}"; do
+    # For now, Mockito-12, Chart-4 and Lang-57 have no coverage for failing tests
+    # It is because test failed before the actual test method starts (such as @Before)
+    # But currently the coverage collection tool can not collect coverage outside the actual test methods
+    if [ ! -f SuspiciousCodePositions/"$PID"_"$BID"/Covered.txt ]; then
+      echo "$PID"_"$BID"/Covered.txt not exists, skipping!
+    fi
     if [ -f patches/"$PID"_"$BID"/patches-pool/patches.info ]; then
       echo "patches.info already exists, skip $PID-$BID"
       continue
