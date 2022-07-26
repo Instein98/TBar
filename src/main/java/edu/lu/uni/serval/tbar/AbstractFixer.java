@@ -90,6 +90,7 @@ public abstract class AbstractFixer implements IFixer {
 //		}
 
 		/* I don't want to run tests before generating patches */
+		minErrorTest = 10;
 //		minErrorTest = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, defects4jPath, failedTestStrList);
 //		if (minErrorTest == Integer.MAX_VALUE) {
 //			TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath);
