@@ -1,19 +1,23 @@
 package edu.lu.uni.serval.tbar;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.lu.uni.serval.tbar.main.Main;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -312,6 +316,8 @@ public abstract class AbstractFixer implements IFixer {
 
 			/* No validation, just output the patch! */
 			outputUniaprStylePatch(scn);
+			outputIndividualPatchInfo(patchInfo);
+			patchInPoolId++;
 
 //			log.debug("Test previously failed test cases.");
 //			try {
@@ -413,11 +419,54 @@ public abstract class AbstractFixer implements IFixer {
 			e1.printStackTrace();
 		}
 
-		Main.currentStmtInfo.put("patches", patchesInfo);
+		if (Main.currentStmtInfo.has("patches")){
+			JSONArray existArr =  (JSONArray) Main.currentStmtInfo.get("patches");
+			Main.currentStmtInfo.put("patches", concatArray(existArr, patchesInfo));
+		} else {
+			Main.currentStmtInfo.put("patches", patchesInfo);
+		}
+	}
+
+	private JSONArray concatArray(JSONArray... arrs) throws JSONException {
+		JSONArray result = new JSONArray();
+		for (JSONArray arr : arrs) {
+			for (int i = 0; i < arr.length(); i++) {
+				result.put(arr.get(i));
+			}
+		}
+		return result;
+	}
+
+	private void outputIndividualPatchInfo(JSONObject patchInfo){
+		String res = "";
+		int curIdx = patchInPoolId;
+		// Iterate statement information of the patch
+		Iterator<String> keys = Main.currentStmtInfo.keys();
+		while(keys.hasNext()) {
+			String key = keys.next();
+			if ("patches".equals(key)){
+				continue;
+			} else {
+				res += key + ": " + Main.currentStmtInfo.get(key) + "\n";
+			}
+		}
+		// Iterate the patch information
+		keys = patchInfo.keys();
+		while(keys.hasNext()) {
+			String key = keys.next();
+			res += key + ": " + patchInfo.get(key) + "\n";
+		}
+		String targetFile = "patches/" + buggyProject + "/patches-pool/" + curIdx + "/patchInfo.txt";
+		try(FileWriter fw = new FileWriter(targetFile);
+			BufferedWriter bw = new BufferedWriter(fw)){
+			bw.write(res);
+		} catch (Throwable t){
+			t.printStackTrace();
+		}
 	}
 
 	private void outputUniaprStylePatch(SuspCodeNode scn){
-		int curIdx = patchInPoolId++;
+		int curIdx = patchInPoolId;
 		String commonPrefix = scn.suspiciousJavaFile.substring(0, scn.suspiciousJavaFile.length()-5);
 		String patchedSourceFilePath = "patches/" + buggyProject + "/patches-pool/" + curIdx + "/" + commonPrefix + ".java";
 		String patchedClassFilePath = "patches/" + buggyProject + "/patches-pool/" + curIdx + "/" + commonPrefix + ".class";
