@@ -515,7 +515,7 @@ public class TBarFixer extends AbstractFixer {
 //		System.out.println(dataType + " ====== " + patchCandidates.size());
 
 		Long timeAfterPatchGeneration = System.currentTimeMillis();
-		Main.currentStmtInfo.put("#patchesGenerated", patchCandidates.size());
+//		Main.currentStmtInfo.put("#patchesGenerated", patchCandidates.size());  // This is invalid, every scn will have a patchCandidates list
 		Main.currentStmtInfo.put("patchesGenerationTimeMs", timeAfterPatchGeneration - timeBeforePatchGeneration);
 
 		// Test generated patches.

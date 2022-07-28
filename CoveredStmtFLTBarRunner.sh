@@ -39,7 +39,7 @@ for PID in "${PID_list[@]}"; do
 
     bugDataPath=/home/yicheng/research/d4jProj/
     bugID="$PID"_"$BID"
-    defects4jHome=/home/yicheng/research/apr/experiments/defects4j/framework/bin/defects4j/
+    defects4jHome=/home/yicheng/research/apr/experiments/defects4j/
     time java -Xmx1g -cp "target/dependency/*" edu.lu.uni.serval.tbar.main.Main $bugDataPath $bugID $defects4jHome
   done
 done

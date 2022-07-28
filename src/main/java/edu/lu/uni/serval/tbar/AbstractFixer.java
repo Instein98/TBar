@@ -95,6 +95,12 @@ public abstract class AbstractFixer implements IFixer {
 
 		/* I don't want to run tests before generating patches */
 		minErrorTest = 10;
+		try{
+			String buggyProject = fullBuggyProjectPath.substring(fullBuggyProjectPath.lastIndexOf("/") + 1);
+			ShellUtils.shellRun(Arrays.asList("cd " + fullBuggyProjectPath + "\n", defects4jPath + "/framework/bin/defects4j compile" + "\n"), buggyProject, 1);
+		} catch (Throwable t){
+			t.printStackTrace();
+		}
 //		minErrorTest = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, defects4jPath, failedTestStrList);
 //		if (minErrorTest == Integer.MAX_VALUE) {
 //			TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath);
@@ -281,9 +287,14 @@ public abstract class AbstractFixer implements IFixer {
 			log.debug("Compiling");
 			Long timeBeforeCompile = System.currentTimeMillis();
 			try {// Compile patched file.
+//				System.out.println("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
+//						+ PathUtils.buildCompileClassPath(Arrays.asList(PathUtils.getJunitPath()), dp.classPath, dp.testClassPath)
+//						+ " -d " + dp.classPath + " " + scn.targetJavaFile.getAbsolutePath());
+//				String res = ShellUtils.shellRun(Arrays.asList("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
 				ShellUtils.shellRun(Arrays.asList("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
 						+ PathUtils.buildCompileClassPath(Arrays.asList(PathUtils.getJunitPath()), dp.classPath, dp.testClassPath)
 						+ " -d " + dp.classPath + " " + scn.targetJavaFile.getAbsolutePath()), buggyProject, 1);
+//				System.out.println(res);
 			} catch (IOException e) {
 				log.debug(buggyProject + " ---Fixer: fix fail because of javac exception! ");
 				Long timeAfterCompile = System.currentTimeMillis();
