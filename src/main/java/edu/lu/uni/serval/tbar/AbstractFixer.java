@@ -276,7 +276,7 @@ public abstract class AbstractFixer implements IFixer {
 			addPatchCodeToFile(scn, patch);// Insert the patch.
 			if (this.triedPatchCandidates.contains(patch)) continue;
 			patchId++;
-			if (patchId > 10000) return;
+//			if (patchId > 10000) return;
 			this.triedPatchCandidates.add(patch);
 			
 			String buggyCode = patch.getBuggyCodeStr();

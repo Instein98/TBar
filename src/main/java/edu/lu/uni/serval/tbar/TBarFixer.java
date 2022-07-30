@@ -116,11 +116,11 @@ public class TBarFixer extends AbstractFixer {
 
 					/* Now we want to exhaustively generate all possible patches */
 					//				if (!isTestFixPatterns && minErrorTest == 0) break;
-					if (this.patchId >= 10000) break;
+//					if (this.patchId >= 10000) break;
 				}
 				/* Now we want to exhaustively generate all possible patches */
 				//			if (!isTestFixPatterns && minErrorTest == 0) break;
-				if (this.patchId >= 10000) break;
+//				if (this.patchId >= 10000) break;
 			} finally {
 				Main.susStmtInfoArr.put(Main.currentStmtInfo);
 			}
@@ -444,7 +444,7 @@ public class TBarFixer extends AbstractFixer {
 					}
 				}
 				ft = null;
-				if (this.patchId >= 10000) break;
+//				if (this.patchId >= 10000) break;
 			}
 			
 			if (!nullChecked) {
