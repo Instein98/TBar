@@ -36,12 +36,12 @@ public class DataPreparer {
         buggyProjectParentPath = path;
     }
     
-    public void prepareData(String buggyProject){
+    public void prepareData(String buggyProject, String projPath){
 //		libPath.add(FromString.class.getProtectionDomain().getCodeSource().getLocation().getFile());
 //		libPath.add(EasyMock.class.getProtectionDomain().getCodeSource().getLocation().getFile());
 //		libPath.add(IOUtils.class.getProtectionDomain().getCodeSource().getLocation().getFile());
 		
-		loadPaths(buggyProject);
+		loadPaths(buggyProject, projPath);
 		
 		if (!checkProjectDirectories()){
 			validPaths = false;
@@ -53,9 +53,9 @@ public class DataPreparer {
 		loadClassPaths();
     }
 
-	private void loadPaths(String buggyProject) {
+	private void loadPaths(String buggyProject, String projPath) {
 		String projectDir = buggyProjectParentPath;
-		List<String> paths = PathUtils.getSrcPath(buggyProject);
+		List<String> paths = PathUtils.getSrcPath(buggyProject, projPath);
 		classPath = projectDir + buggyProject + paths.get(0);
 		testClassPath = projectDir + buggyProject + paths.get(1);
 		srcPath = projectDir + buggyProject + paths.get(2);

@@ -118,7 +118,7 @@ public abstract class AbstractFixer implements IFixer {
 		
 		// Read paths of the buggy project.
 		this.dp = new DataPreparer(path);
-		dp.prepareData(buggyProject);
+		dp.prepareData(buggyProject, fullBuggyProjectPath);
 		
 //		readPreviouslyFailedTestCases();
 		

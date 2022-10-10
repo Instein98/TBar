@@ -1,5 +1,9 @@
 package edu.lu.uni.serval.tbar.utils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,87 +11,111 @@ import org.apache.commons.lang3.StringUtils;
 
 public class PathUtils {
 
-	public static ArrayList<String> getSrcPath(String bugProject) {
+	public static String getD4jProjProperty(String projectPath, String property){
+		StringBuilder sb = new StringBuilder();
+		ProcessBuilder builder = new ProcessBuilder("defects4j", "export", "-p", property);
+		builder.directory(new File(projectPath));
+		try{
+			Process process = builder.start();
+			InputStream is = process.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+			}
+			reader.close();
+			is.close();
+		} catch (Throwable t){
+			t.printStackTrace();
+		}
+		return sb.toString().trim();
+	}
+
+	public static ArrayList<String> getSrcPath(String bugProject, String projPath) {
 		ArrayList<String> path = new ArrayList<String>();
 		String[] words = bugProject.split("_");
 		String projectName = words[0];
 		int bugId = Integer.parseInt(words[1]);
-		// Todo: change this to generalizable approach
-		if (projectName.equals("Math")) {
-			if (bugId < 85) {
-				path.add("/target/classes/");
-				path.add("/target/test-classes/");
-				path.add("/src/main/java/");
-				path.add("/src/test/java/");
-			} else {
-				path.add("/target/classes/");
-				path.add("/target/test-classes/");
-				path.add("/src/java/");
-				path.add("/src/test/");
-			}
-		} else if (projectName.equals("Time")) {
-			if (bugId < 12) {
-				path.add("/target/classes/");
-				path.add("/target/test-classes/");
-				path.add("/src/main/java/");
-				path.add("/src/test/java/");
-			} else {
-				path.add("/build/classes/");
-				path.add("/build/tests/");
-				path.add("/src/main/java/");
-				path.add("/src/test/java/");
-			}
-		} else if (projectName.equals("Lang")) {
-			if (bugId <= 20) {
-				path.add("/target/classes/");
-				path.add("/target/tests/");
-				path.add("/src/main/java/");
-				path.add("/src/test/java/");
-			} else if (bugId >= 21 && bugId <= 35) {
-				path.add("/target/classes/");
-				path.add("/target/test-classes/");
-				path.add("/src/main/java/");
-				path.add("/src/test/java/");
-			} else if (bugId >= 36 && bugId <= 41) {
-				path.add("/target/classes/");
-				path.add("/target/test-classes/");
-				path.add("/src/java/");
-				path.add("/src/test/");
-			} else if (bugId >= 42 && bugId <= 65) {
-				path.add("/target/classes/");
-				path.add("/target/tests/");
-				path.add("/src/java/");
-				path.add("/src/test/");
-			}
-		} else if (projectName.equals("Chart")) {
-			path.add("/build/");
-			path.add("/build-tests/");
-			path.add("/source/");
-			path.add("/tests/");
-
-		} else if (projectName.equals("Closure")) {
-			path.add("/build/classes/");
-			path.add("/build/test/");
-			path.add("/src/");
-			path.add("/test/");
-		} else if (projectName.equals("Mockito")) {
-			if (bugId <= 11 || (bugId >= 18 && bugId <= 21)) {
-				path.add("/build/classes/main/");
-				path.add("/build/classes/test/");
-				path.add("/src/");
-				path.add("/test/");
-			} else {
-				path.add("/target/classes/");
-				path.add("/target/test-classes/");
-				path.add("/src/");
-				path.add("/test/");
-			}
-		} else if (projectName.equals("Cli")){
-			path.add("/target/classes/");
-			path.add("/target/test-classes/");
-			path.add("/src/java/");
-			path.add("/src/test/");
-		}
+		path.add("/" + getD4jProjProperty(projPath, "dir.bin.classes") + "/");
+		path.add("/" + getD4jProjProperty(projPath, "dir.bin.tests") + "/");
+		path.add("/" + getD4jProjProperty(projPath, "dir.src.classes") + "/");
+		path.add("/" + getD4jProjProperty(projPath, "dir.src.tests") + "/");
+//		if (projectName.equals("Math")) {
+//			if (bugId < 85) {
+//				path.add("/target/classes/");
+//				path.add("/target/test-classes/");
+//				path.add("/src/main/java/");
+//				path.add("/src/test/java/");
+//			} else {
+//				path.add("/target/classes/");
+//				path.add("/target/test-classes/");
+//				path.add("/src/java/");
+//				path.add("/src/test/");
+//			}
+//		} else if (projectName.equals("Time")) {
+//			if (bugId < 12) {
+//				path.add("/target/classes/");
+//				path.add("/target/test-classes/");
+//				path.add("/src/main/java/");
+//				path.add("/src/test/java/");
+//			} else {
+//				path.add("/build/classes/");
+//				path.add("/build/tests/");
+//				path.add("/src/main/java/");
+//				path.add("/src/test/java/");
+//			}
+//		} else if (projectName.equals("Lang")) {
+//			if (bugId <= 20) {
+//				path.add("/target/classes/");
+//				path.add("/target/tests/");
+//				path.add("/src/main/java/");
+//				path.add("/src/test/java/");
+//			} else if (bugId >= 21 && bugId <= 35) {
+//				path.add("/target/classes/");
+//				path.add("/target/test-classes/");
+//				path.add("/src/main/java/");
+//				path.add("/src/test/java/");
+//			} else if (bugId >= 36 && bugId <= 41) {
+//				path.add("/target/classes/");
+//				path.add("/target/test-classes/");
+//				path.add("/src/java/");
+//				path.add("/src/test/");
+//			} else if (bugId >= 42 && bugId <= 65) {
+//				path.add("/target/classes/");
+//				path.add("/target/tests/");
+//				path.add("/src/java/");
+//				path.add("/src/test/");
+//			}
+//		} else if (projectName.equals("Chart")) {
+//			path.add("/build/");
+//			path.add("/build-tests/");
+//			path.add("/source/");
+//			path.add("/tests/");
+//
+//		} else if (projectName.equals("Closure")) {
+//			path.add("/build/classes/");
+//			path.add("/build/test/");
+//			path.add("/src/");
+//			path.add("/test/");
+//		} else if (projectName.equals("Mockito")) {
+//			if (bugId <= 11 || (bugId >= 18 && bugId <= 21)) {
+//				path.add("/build/classes/main/");
+//				path.add("/build/classes/test/");
+//				path.add("/src/");
+//				path.add("/test/");
+//			} else {
+//				path.add("/target/classes/");
+//				path.add("/target/test-classes/");
+//				path.add("/src/");
+//				path.add("/test/");
+//			}
+//		} else if (projectName.equals("Cli")){
+//			path.add("/target/classes/");
+//			path.add("/target/test-classes/");
+//			path.add("/src/java/");
+//			path.add("/src/test/");
+//		}
 		return path;
 	}
 
@@ -127,5 +155,10 @@ public class PathUtils {
 		path += "\"";
 		return path;
     }
+
+	public static void main(String[] args) {
+		String res = getD4jProjProperty("/Users/yicheng/research/apr/repo/tbar/d4jProj/Cli_1", "dir.src.classes");
+		System.out.print(res);
+	}
 
 }
