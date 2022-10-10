@@ -88,19 +88,26 @@ public abstract class AbstractFixer implements IFixer {
 //      	log.debug(buggyProject + " ---Fixer: fix fail because of compile fail! ");
 //      }
 		
-		TestUtils.checkout(this.fullBuggyProjectPath);
+//		TestUtils.checkout(this.fullBuggyProjectPath);  // YC: Comment because it will clear the applied mutants
 //		if (FileHelper.getAllFiles(fullBuggyProjectPath + PathUtils.getSrcPath(buggyProject).get(0), ".class").isEmpty()) {
-			TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath);
+		minErrorTest = 10;
+			int compileSucceed = TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath);
+			if (compileSucceed != 0) {
+				System.out.println(String.format("Compilation failed for %s-%s", projectName, bugId));
+				// if compilation failed, set minErrorTest to MAX_VALUE, which will be checked at edu/lu/uni/serval/tbar/main/MainPerfectFL.java:77
+				minErrorTest = Integer.MAX_VALUE;
+			}
 //		}
 
 		/* I don't want to run tests before generating patches */
-		minErrorTest = 10;
-		try{
-			String buggyProject = fullBuggyProjectPath.substring(fullBuggyProjectPath.lastIndexOf("/") + 1);
-			ShellUtils.shellRun(Arrays.asList("cd " + fullBuggyProjectPath + "\n", defects4jPath + "/framework/bin/defects4j compile" + "\n"), buggyProject, 1);
-		} catch (Throwable t){
-			t.printStackTrace();
-		}
+
+		// already compiled above?
+//		try{
+//			String buggyProject = fullBuggyProjectPath.substring(fullBuggyProjectPath.lastIndexOf("/") + 1);
+//			ShellUtils.shellRun(Arrays.asList("cd " + fullBuggyProjectPath + "\n", defects4jPath + "/framework/bin/defects4j compile" + "\n"), buggyProject, 1);
+//		} catch (Throwable t){
+//			t.printStackTrace();
+//		}
 //		minErrorTest = TestUtils.getFailTestNumInProject(fullBuggyProjectPath, defects4jPath, failedTestStrList);
 //		if (minErrorTest == Integer.MAX_VALUE) {
 //			TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath);

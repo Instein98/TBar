@@ -30,8 +30,8 @@ public class MainPerfectFL {
 		String bugDataPath = args[0];//"/Users/kui.liu/Public/Defects4J_Data/";//
 		String bugId = args[1]; //"Closure_4";// 
 		String defects4jHome = args[2];//"/Users/kui.liu/Public/GitRepos/defects4j/";//
-		Configuration.failedTestCasesFilePath = args[3];//"/Users/kui.liu/eclipse-fault-localization/FL-VS-APR/data/FailedTestCases/";//
-		Configuration.knownBugPositions = args[4];
+//		Configuration.failedTestCasesFilePath = args[3];//"/Users/kui.liu/eclipse-fault-localization/FL-VS-APR/data/FailedTestCases/";//
+		Configuration.knownBugPositions = args[3];
 		boolean isTestFixPatterns = false;//Boolean.valueOf(args[3]);//
 		String granularityStr = "Line";
 		System.out.println(bugId);

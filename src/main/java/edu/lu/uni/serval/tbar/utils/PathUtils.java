@@ -12,6 +12,7 @@ public class PathUtils {
 		String[] words = bugProject.split("_");
 		String projectName = words[0];
 		int bugId = Integer.parseInt(words[1]);
+		// Todo: change this to generalizable approach
 		if (projectName.equals("Math")) {
 			if (bugId < 85) {
 				path.add("/target/classes/");
@@ -81,6 +82,11 @@ public class PathUtils {
 				path.add("/src/");
 				path.add("/test/");
 			}
+		} else if (projectName.equals("Cli")){
+			path.add("/target/classes/");
+			path.add("/target/test-classes/");
+			path.add("/src/java/");
+			path.add("/src/test/");
 		}
 		return path;
 	}
