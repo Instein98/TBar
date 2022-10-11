@@ -1,11 +1,17 @@
 package edu.lu.uni.serval.tbar.main;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.lu.uni.serval.tbar.TBarFixer;
 import edu.lu.uni.serval.tbar.TBarFixer.Granularity;
 import edu.lu.uni.serval.tbar.config.Configuration;
+
+import java.io.FileWriter;
 
 /**
  * Fix bugs with the known bug positions.
@@ -92,6 +98,15 @@ public class MainPerfectFL {
 		case 2:
 			log.info("=======Partial succeeded to fix bug " + bugIdStr);
 			break;
+		}
+
+		System.out.println("Patch generation for " + bugIdStr + " is done.");
+		try(FileWriter writer = new FileWriter("patches/" + bugIdStr + "/patches-pool/patches.info", false)){
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonElement je = JsonParser.parseString(Main.susStmtInfoArr.toString());
+			writer.write(gson.toJson(je));
+		} catch (Throwable t){
+			t.printStackTrace();
 		}
 	}
 
