@@ -3,8 +3,8 @@ import shutil
 import subprocess as sp
 from pathlib import Path
 
-processPool = []  # storing (cmd, cwd, process)
-maxMultiProcess = 1  # Todo: multiple tbar patch generation processes will all stuck
+processPool = []  # storing (cmd, cwd, process, logFileObj)
+maxMultiProcess = 8
 
 def runCmdAndWaitForFinish(cmd: list, cwd=None):
     process = sp.Popen(cmd, shell=False, stdout=sp.PIPE, stderr=sp.PIPE, cwd=cwd, universal_newlines=True)
@@ -12,15 +12,23 @@ def runCmdAndWaitForFinish(cmd: list, cwd=None):
     retCode = process.poll()
     return stdout, stderr, retCode
 
-def tryRunCmdWithProcessPool(cmd: list, cwd=None, insist=True):
+# Warning: if the logPath is not set, the process may stuck sometimes. See https://stackoverflow.com/a/39607358/11495796
+def tryRunCmdWithProcessPool(cmd: list, logPath: str, cwd=None, insist=True):
     if len(processPool) >= maxMultiProcess:
         if insist:
             waitForProcessPoolSlotAvailable()
         else:
             return False
-    process = sp.Popen(cmd, shell=False, stdout=sp.PIPE, stderr=sp.PIPE, cwd=cwd, universal_newlines=True)  # shell=False by default
+    stdout = sp.PIPE
+    stderr = sp.PIPE
+    logFileObj = None
+    if logPath is not None:
+        logFileObj = open(logPath, 'w')
+        stdout = logFileObj
+        stderr = logFileObj
+    process = sp.Popen(cmd, shell=False, stdout=stdout, stderr=stderr, cwd=cwd, universal_newlines=True)  # shell=False by default
     cwd = '.' if cwd is None else cwd
-    processPool.append((cmd, cwd, process))
+    processPool.append((cmd, cwd, process, logFileObj))
     print("Process \"{}\"@\"{}\" has started and been added to the pool.".format(cmd, cwd))
     return True
 
@@ -28,7 +36,7 @@ def waitUntilMultiProcessLessThan(t):
     if len(processPool) >= t:
         print("[INFO] Waiting the number of parallel processes become less than " + str(t))
     while len(processPool) >= t:
-        for cmd, cwd, process in processPool:
+        for cmd, cwd, process, logFileObj in processPool:
             retCode = process.poll()
             # haven't finished yet
             if retCode is None:
@@ -36,15 +44,17 @@ def waitUntilMultiProcessLessThan(t):
             else:
                 print('=' * 10 + ' `{}` in "{}" Finished '.format(cmd, cwd) + '=' * 10)
                 print('*' * 10 + ' RetCode: ' + str(retCode) + ' ' + ('*' * 10))
-                stdout, stderr = process.communicate()
-                print('*' * 10 + ' STDOUT ' + ('*' * 10))
-                if stdout is not None and len(stdout) > 0:
-                    print(stdout)
-                print('*' * 10 + ' STDERR ' + ('*' * 10))
-                if stderr is not None and len(stderr) > 0:
-                    print(stderr)
+                # stdout, stderr = process.communicate()
+                # print('*' * 10 + ' STDOUT ' + ('*' * 10))
+                # if stdout is not None and len(stdout) > 0:
+                    # print(stdout)
+                # print('*' * 10 + ' STDERR ' + ('*' * 10))
+                # if stderr is not None and len(stderr) > 0:
+                    # print(stderr)
                 print('=' * (20 + len(' `{}` in "{}" Finished '.format(cmd, cwd))))
-                processPool.remove((cmd, cwd, process))
+                processPool.remove((cmd, cwd, process, logFileObj))
+                if logFileObj is not None:
+                    logFileObj.close()
                 print('Found {} process in pool running'.format(len(processPool)))
                 break
 
@@ -61,6 +71,8 @@ tbarD4jProjDirPath = Path('tbarD4jProj').resolve()  # copy the project need to b
 tbarD4jProjDirPath.mkdir(exist_ok=True)
 bugPositionFile = Path('MutBenchBugPositions.txt').resolve()
 patchesDirPath = Path('patches').resolve()
+logDirPath = (Path('logs') / 'generation').resolve()
+logDirPath.mkdir(exist_ok=True)
 d4jHome = '/home/yicheng/research/apr/experiments/defects4j/'
 
 def getFinishedProjPath():
@@ -157,7 +169,12 @@ def main():
             print('=' * 10 + 'Start {}_{}'.format(projName, mid) + '=' * 10)
             # checkout the original fixed version
             targetProjPath = tbarD4jProjDirPath / '{}_{}'.format(projName, mid)
-            sp.run('defects4j checkout -p {} -v {} -w {}'.format(formalProjName, version, str(targetProjPath)), shell=True, universal_newlines=True, check=True)
+            try:
+                sp.run('defects4j checkout -p {} -v {} -w {}'.format(formalProjName, version, str(targetProjPath)), shell=True, universal_newlines=True, check=True)
+            except:
+                print('Try removing {} and checkout again...'.format(str(targetProjPath)))
+                shutil.rmtree(str(targetProjPath), ignore_errors=True)
+                sp.run('defects4j checkout -p {} -v {} -w {}'.format(formalProjName, version, str(targetProjPath)), shell=True, universal_newlines=True, check=True)
             # apply the mutant file
             applyMutant(targetProjPath, projPath, mid, srcRelativePath=srcRelativePath)
             try:
@@ -166,7 +183,8 @@ def main():
                 print('[ERROR] The mutant {}-{} can not be compiled by defects4j.'.format(projName, mid))
                 continue
             # start the patch generation
-            tryRunCmdWithProcessPool('bash PerfectFLTBarRunner.sh {} {}_{} {} {}'.format(str(tbarD4jProjDirPath) + '/', projName, mid, d4jHome, str(bugPositionFile)).split(), insist=True)
+            logPath = logDirPath / ('{}_{}.log'.format(projName, mid))
+            tryRunCmdWithProcessPool('bash PerfectFLTBarRunner.sh {} {}_{} {} {}'.format(str(tbarD4jProjDirPath) + '/', projName, mid, d4jHome, str(bugPositionFile)).split(), logPath, insist=True)
         waitForProcessPoolFinish()
         print('=' * 10 + str(projPath) + ' Finished' + '=' * 10)
         for mid in mids:
@@ -200,14 +218,16 @@ def runTbarOnSingleMutant(projName: str, mid: int):
             # start the patch generation
             cmd = 'bash PerfectFLTBarRunner.sh {} {}_{} {} {}'.format(str(tbarD4jProjDirPath) + '/', projName, mid, d4jHome, str(bugPositionFile)).split()
             # sp.run(cmd, shell=False, universal_newlines=True)
-            tryRunCmdWithProcessPool('bash PerfectFLTBarRunner.sh {} {}_{} {} {}'.format(str(tbarD4jProjDirPath) + '/', projName, mid, d4jHome, str(bugPositionFile)).split(), insist=True)
+            logPath = logDirPath / ('{}_{}.log'.format(projName, mid))
+            tryRunCmdWithProcessPool('bash PerfectFLTBarRunner.sh {} {}_{} {} {}'.format(str(tbarD4jProjDirPath) + '/', projName, mid, d4jHome, str(bugPositionFile)).split(), str(logPath), insist=True)
             waitForProcessPoolFinish()
 
 if __name__ == '__main__':
     try:
         # genMutBenchBugPositions()
-        # main()
-        runTbarOnSingleMutant('csv', 526)
+        main()
+        # runTbarOnSingleMutant('csv', 526)
     finally:
-        for _, _, p in processPool:
+        for _, _, p, log in processPool:
+            log.close()
             p.kill()
