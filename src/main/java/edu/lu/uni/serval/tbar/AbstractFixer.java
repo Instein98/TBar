@@ -289,47 +289,47 @@ public abstract class AbstractFixer implements IFixer {
 			String buggyCode = patch.getBuggyCodeStr();
 			if ("===StringIndexOutOfBoundsException===".equals(buggyCode)) continue;
 			String patchCode = patch.getFixedCodeStr1();
-			scn.targetClassFile.delete();
+//			scn.targetClassFile.delete();
 
-			log.debug("Compiling");
-			Long timeBeforeCompile = System.currentTimeMillis();
-			try {// Compile patched file.
-//				System.out.println("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
+//			log.debug("Compiling");
+//			Long timeBeforeCompile = System.currentTimeMillis();
+//			try {// Compile patched file.
+////				System.out.println("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
+////						+ PathUtils.buildCompileClassPath(Arrays.asList(PathUtils.getJunitPath()), dp.classPath, dp.testClassPath)
+////						+ " -d " + dp.classPath + " " + scn.targetJavaFile.getAbsolutePath());
+////				String res = ShellUtils.shellRun(Arrays.asList("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
+//				ShellUtils.shellRun(Arrays.asList("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
 //						+ PathUtils.buildCompileClassPath(Arrays.asList(PathUtils.getJunitPath()), dp.classPath, dp.testClassPath)
-//						+ " -d " + dp.classPath + " " + scn.targetJavaFile.getAbsolutePath());
-//				String res = ShellUtils.shellRun(Arrays.asList("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
-				ShellUtils.shellRun(Arrays.asList("javac -Xlint:unchecked -source 1.7 -target 1.7 -cp "
-						+ PathUtils.buildCompileClassPath(Arrays.asList(PathUtils.getJunitPath()), dp.classPath, dp.testClassPath)
-						+ " -d " + dp.classPath + " " + scn.targetJavaFile.getAbsolutePath()), buggyProject, 1);
-//				System.out.println(res);
-			} catch (IOException e) {
-				log.debug(buggyProject + " ---Fixer: fix fail because of javac exception! ");
-				Long timeAfterCompile = System.currentTimeMillis();
-				patchInfo.put("compilable", false);
-				patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
-				patchesInfo.put(patchInfo);
-				log.info(String.format("= Patch %d failed to compile in %d ms =", patchId, timeAfterCompile-timeBeforeCompile));
-				continue;
-			}
-			if (!scn.targetClassFile.exists()) { // fail to compile
-				int results = (this.buggyProject.startsWith("Mockito") || this.buggyProject.startsWith("Closure") || this.buggyProject.startsWith("Time")) ? TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath) : 1;
-				if (results == 1) {
-					log.debug(buggyProject + " ---Fixer: fix fail because of failed compiling! ");
-					Long timeAfterCompile = System.currentTimeMillis();
-					patchInfo.put("compilable", false);
-					patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
-					patchesInfo.put(patchInfo);
-					log.info(String.format("= Patch %d failed to compile in %d ms =", patchId, timeAfterCompile-timeBeforeCompile));
-					continue;
-				}
-			}
-			log.debug("Finish of compiling.");
+//						+ " -d " + dp.classPath + " " + scn.targetJavaFile.getAbsolutePath()), buggyProject, 1);
+////				System.out.println(res);
+//			} catch (IOException e) {
+////				log.debug(buggyProject + " ---Fixer: fix fail because of javac exception! ");
+////				Long timeAfterCompile = System.currentTimeMillis();
+////				patchInfo.put("compilable", false);
+////				patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
+////				patchesInfo.put(patchInfo);
+////				log.info(String.format("= Patch %d failed to compile in %d ms =", patchId, timeAfterCompile-timeBeforeCompile));
+////				continue;
+//			}
+//			if (!scn.targetClassFile.exists()) { // fail to compile
+//				int results = (this.buggyProject.startsWith("Mockito") || this.buggyProject.startsWith("Closure") || this.buggyProject.startsWith("Time")) ? TestUtils.compileProjectWithDefects4j(fullBuggyProjectPath, defects4jPath) : 1;
+//				if (results == 1) {
+//					log.debug(buggyProject + " ---Fixer: fix fail because of failed compiling! ");
+//					Long timeAfterCompile = System.currentTimeMillis();
+//					patchInfo.put("compilable", false);
+//					patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
+//					patchesInfo.put(patchInfo);
+//					log.info(String.format("= Patch %d failed to compile in %d ms =", patchId, timeAfterCompile-timeBeforeCompile));
+//					continue;
+//				}
+//			}
+//			log.debug("Finish of compiling.");
 			Long timeAfterCompile = System.currentTimeMillis();
-			patchInfo.put("compilable", true);
-			patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
+//			patchInfo.put("compilable", true);
+//			patchInfo.put("compilationTimeMs", timeAfterCompile-timeBeforeCompile);
 			patchInfo.put("patchPoolId", patchInPoolId);
 			patchesInfo.put(patchInfo);
-			log.info(String.format("= Compilable patch %d compiled in %d ms (patch-pool id: %d) =", patchId, timeAfterCompile-timeBeforeCompile, patchInPoolId));
+//			log.info(String.format("= Compilable patch %d compiled in %d ms (patch-pool id: %d) =", patchId, timeAfterCompile-timeBeforeCompile, patchInPoolId));
 			comparablePatches++;
 
 			/* No validation, just output the patch! */
@@ -487,15 +487,15 @@ public abstract class AbstractFixer implements IFixer {
 		int curIdx = patchInPoolId;
 		String commonPrefix = scn.suspiciousJavaFile.substring(0, scn.suspiciousJavaFile.length()-5);
 		String patchedSourceFilePath = "patches/" + buggyProject + "/patches-pool/" + curIdx + "/" + commonPrefix + ".java";
-		String patchedClassFilePath = "patches/" + buggyProject + "/patches-pool/" + curIdx + "/" + commonPrefix + ".class";
+//		String patchedClassFilePath = "patches/" + buggyProject + "/patches-pool/" + curIdx + "/" + commonPrefix + ".class";
 		File patchedSourceFile = new File(patchedSourceFilePath);
-		File patchedClassFile = new File(patchedClassFilePath);
+//		File patchedClassFile = new File(patchedClassFilePath);
 		if (!patchedSourceFile.getParentFile().exists()){
 			patchedSourceFile.getParentFile().mkdirs();
 		}
 		try{
 			Files.copy(scn.targetJavaFile.toPath(), patchedSourceFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(scn.targetClassFile.toPath(), patchedClassFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//			Files.copy(scn.targetClassFile.toPath(), patchedClassFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (Throwable t){
 			t.printStackTrace();
 		}
