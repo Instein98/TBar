@@ -146,12 +146,125 @@ def applyMutant(targetProjPath: Path, originalProjPath: Path, mid: str, srcRelat
     shutil.copy(str(fileToBeReplacedPath), str(fileToBeReplacedPath) + '.bak')
     shutil.copy(str(mutantPath), str(fileToBeReplacedPath))
     sp.run("diff -s {} {}".format(str(fileToBeReplacedPath) + '.bak', str(fileToBeReplacedPath)), shell=True, universal_newlines=True)
+    return str(fileToBeReplacedPath), javaFileRelativePath
 
+def getMutFixedFileContent(projPath: Path, mutId: str, projSrcPath=None):
+    mutLog = projPath / 'mutants.log'
+    projSrcRelativePath = sp.check_output("defects4j export -p dir.src.classes", shell=True, universal_newlines=True, cwd=str(projPath), stderr=sp.DEVNULL).strip() if projSrcPath is None else projSrcPath
+    shortPath = sp.check_output('find . -name "*.java"', shell=True, universal_newlines=True, cwd=str(projPath / 'mutants' / mutId)).strip()
+    assert mutLog.exists()
+    with mutLog.open() as log:
+        for line in log:
+            if line.startswith(mutId + ':'):
+                m = re.match(r'.+:(.*?)@.*:(\d+):.+\n', line)
+                if (m is None):
+                    print("Mutant-{} has no match for '.+:(.*?)@.*:(\d+):.+\n' in line {}".format(mutId, line))
+                assert m is not None
+                lineNum = int(m[2])
+                javaFilePath = projPath / (projSrcRelativePath + '/' + shortPath)
+                with javaFilePath.open() as f:
+                    return f.read()
+
+def getMutLineNum(projPath: Path, mutId: str):
+    mutLog = projPath / 'mutants.log'
+    assert mutLog.exists()
+    with mutLog.open() as log:
+        for line in log:
+            if line.startswith(mutId + ':'):
+                m = re.match(r'.+:(\d+):.+\n', line)
+                if (m is None):
+                    print("Mutant-{} has no match for '.+:(\d+):[^:]+' in line {}".format(mutId, line))
+                assert m is not None
+                return int(m[1])
+
+def getFileLine(path: Path, lineNum: int):
+    cnt = 1
+    with path.open() as f:
+        for line in f:
+            if cnt == lineNum:
+                return line
+            cnt += 1
+    print("{} do not have line number {}".format(str(path), lineNum))
+    return None
+
+def getMutator(projPath: Path, mutId: str):
+    mutLog = projPath / 'mutants.log'
+    assert mutLog.exists()
+    with mutLog.open() as log:
+        for line in log:
+            if line.startswith(mutId + ':'):
+                m = re.match(r'\d+:(\w+):.*\n', line)
+                assert m is not None
+                return m[1]
+
+def isExactlySameCode(a:str, b:str):
+    tmp1 = ''.join(a.split())
+    tmp2 = ''.join(b.split())
+    return tmp1 == tmp2
+
+def checkAllPatches():
+    mutatorDict = {}
+    resDict = {}
+    for projPath in getFinishedProjPath():
+        m = re.match(r'(\w+)-(\d+f)', projPath.stem)
+        assert m is not None
+        projName = m[1]
+        # if projName != "jacksoncore":
+        #     continue
+        srcRelativePath=getD4jProjSrcRelativePath(projPath)
+        print('='*15 + projName + '='*15)
+        for dir in patchesDirPath.iterdir():
+            if dir.is_dir() and dir.stem.startswith(projName):
+                mid = dir.stem.split('_')[1]
+                print('Checking ' + dir.stem)
+                for idDir in (dir / 'patches-pool').iterdir():
+                    if idDir.is_dir():
+                        patchFilePath = sp.check_output("find . -name '*.java'", shell=True, universal_newlines=True, cwd=str(idDir)).strip()
+                        patchFilePath = idDir / patchFilePath
+                        # mutLineNum = getMutLineNum(projPath, mid)
+                        # patchedLine = getFileLine(patchFilePath, mutLineNum)
+                        with patchFilePath.open() as f:
+                            patchFileContent  = f.read()
+                        fixedJavaFileContent = getMutFixedFileContent(projPath, mid, projSrcPath=srcRelativePath)
+                        if isExactlySameCode(patchFileContent, fixedJavaFileContent):
+                            mutator = getMutator(projPath, mid)
+                            if mutator not in mutatorDict:
+                                mutatorDict[mutator] = []
+                            mutatorDict[mutator].append(projPath.stem)
+                            if projName not in resDict:
+                                resDict[projName] = []
+                            resDict[projName].append(mid)
+                            print("{} fixed!".format(dir.stem))
+                            break
+    proj = [k for k in resDict]
+    proj.sort()
+    for key in proj:
+        print("{} mutants of {} are correctly (exactly) fixed!".format(len(resDict[key]), key))
+    mutators = [k for k in mutatorDict]
+    mutators.sort()
+    for m in mutators:
+        print("{}: {}".format(m, len(mutatorDict[m])))
+
+def getAllMutators():
+    mutatorDict = {}
+    for projPath in getFinishedProjPath():
+        sampleTxt = projPath / 'sampledMutIds.txt'
+        mids = file2Lines(sampleTxt)
+        for mid in mids:
+            mutator = getMutator(projPath, mid)
+            if mutator not in mutatorDict:
+                mutatorDict[mutator] = []
+            mutatorDict[mutator].append(mid)
+    mutators = [k for k in mutatorDict]
+    mutators.sort()
+    for m in mutators:
+        print("{}: {}".format(m, len(mutatorDict[m])))
 
 def main():
     for projPath in getFinishedProjPath():
         print('=' * 10 + str(projPath) + '=' * 10)
         srcRelativePath=getD4jProjSrcRelativePath(projPath)
+        buildRelativePath=getD4jProperty(projPath, 'dir.bin.classes')
         sampleTxt = projPath / 'sampledMutIds.txt'
         assert sampleTxt.exists()
         m = re.match(r'(\w+)-(\d+f)', projPath.stem)
@@ -176,12 +289,17 @@ def main():
                 shutil.rmtree(str(targetProjPath), ignore_errors=True)
                 sp.run('defects4j checkout -p {} -v {} -w {}'.format(formalProjName, version, str(targetProjPath)), shell=True, universal_newlines=True, check=True)
             # apply the mutant file
-            applyMutant(targetProjPath, projPath, mid, srcRelativePath=srcRelativePath)
+            fileToBeReplacedPath, javaFileRelativePath = applyMutant(targetProjPath, projPath, mid, srcRelativePath=srcRelativePath)
+            javacOutputDirPath = str((Path(targetProjPath) / buildRelativePath / javaFileRelativePath).parent)
             try:
                 sp.run('defects4j compile', shell=True, universal_newlines=True, check=True, cwd=str(targetProjPath))
             except:
-                print('[ERROR] The mutant {}-{} can not be compiled by defects4j.'.format(projName, mid))
-                continue
+                try:
+                    cmd = 'javac {} -cp {} -d {}'.format(fileToBeReplacedPath, buildRelativePath, javacOutputDirPath).split()
+                    sp.run(cmd, shell=False, universal_newlines=True, check=True, cwd=str(targetProjPath))
+                except:
+                    print('[ERROR] The mutant {}-{} can not be compiled by defects4j.'.format(projName, mid))
+                    continue
             # start the patch generation
             logPath = logDirPath / ('{}_{}.log'.format(projName, mid))
             tryRunCmdWithProcessPool('bash PerfectFLTBarRunner.sh {} {}_{} {} {}'.format(str(tbarD4jProjDirPath) + '/', projName, mid, d4jHome, str(bugPositionFile)).split(), logPath, insist=True)
@@ -197,6 +315,7 @@ def runTbarOnSingleMutant(projName: str, mid: int):
         if projPath.stem.startswith(projName + '-'):
             print('=' * 10 + str(projPath) + '=' * 10)
             srcRelativePath=getD4jProjSrcRelativePath(projPath)
+            buildRelativePath=getD4jProperty(projPath, 'dir.bin.classes')
             sampleTxt = projPath / 'sampledMutIds.txt'
             assert sampleTxt.exists()
             m = re.match(r'(\w+)-(\d+f)', projPath.stem)
@@ -209,12 +328,17 @@ def runTbarOnSingleMutant(projName: str, mid: int):
             targetProjPath = tbarD4jProjDirPath / '{}_{}'.format(projName, mid)
             sp.run('defects4j checkout -p {} -v {} -w {}'.format(formalProjName, version, str(targetProjPath)), shell=True, universal_newlines=True, check=True)
             # apply the mutant file
-            applyMutant(targetProjPath, projPath, mid, srcRelativePath=srcRelativePath)
+            fileToBeReplacedPath, javaFileRelativePath = applyMutant(targetProjPath, projPath, mid, srcRelativePath=srcRelativePath)
+            javacOutputDirPath = str((Path(targetProjPath) / buildRelativePath / javaFileRelativePath).parent)
             try:
                 sp.run('defects4j compile', shell=True, universal_newlines=True, check=True, cwd=str(targetProjPath))
             except:
-                print('[ERROR] The mutant {}-{} can not be compiled by defects4j.'.format(projName, mid))
-                continue
+                try:
+                    cmd = 'javac {} -cp {} -d {}'.format(fileToBeReplacedPath, buildRelativePath, javacOutputDirPath).split()
+                    sp.run(cmd, shell=False, universal_newlines=True, check=True, cwd=str(targetProjPath))
+                except:
+                    print('[ERROR] The mutant {}-{} can not be compiled by defects4j.'.format(projName, mid))
+                    continue
             # start the patch generation
             cmd = 'bash PerfectFLTBarRunner.sh {} {}_{} {} {}'.format(str(tbarD4jProjDirPath) + '/', projName, mid, d4jHome, str(bugPositionFile)).split()
             # sp.run(cmd, shell=False, universal_newlines=True)
@@ -226,7 +350,9 @@ if __name__ == '__main__':
     try:
         # genMutBenchBugPositions()
         main()
-        # runTbarOnSingleMutant('csv', 526)
+        # runTbarOnSingleMutant('time', 16447)
+        # checkAllPatches()
+        # getAllMutators()
     finally:
         for _, _, p, log in processPool:
             log.close()
