@@ -243,7 +243,7 @@ def checkAllPatches():
     mutators = [k for k in mutatorDict]
     mutators.sort()
     for m in mutators:
-        print("{}: {}".format(m, len(mutatorDict[m])))
+        print("{} {}".format(m, len(mutatorDict[m])))
 
 def getAllMutators():
     mutatorDict = {}
@@ -259,6 +259,17 @@ def getAllMutators():
     mutators.sort()
     for m in mutators:
         print("{}: {}".format(m, len(mutatorDict[m])))
+
+def tmp():
+    for projPath in getFinishedProjPath():
+        m = re.match(r'(\w+)-(\d+f)', projPath.stem)
+        assert m is not None
+        projName = m[1]
+        version = m[2]
+        formalProjName = getProjFormalNameFromProjSimpleName(projName)
+        # print('defects4j checkout -p {0} -v {1} -w {2} || (echo "[ERROR] Failed to checkout {0}-{1}!" && exit 1 ) ;'.format(formalProjName, version, projName))
+        print('echo "========== Start testing {} ==========="'.format(projName))
+        print('cd $pwd && cd d4jProj/{} && time defects4j test'.format(projName))
 
 def main():
     for projPath in getFinishedProjPath():
@@ -346,10 +357,39 @@ def runTbarOnSingleMutant(projName: str, mid: int):
             tryRunCmdWithProcessPool('bash PerfectFLTBarRunner.sh {} {}_{} {} {}'.format(str(tbarD4jProjDirPath) + '/', projName, mid, d4jHome, str(bugPositionFile)).split(), str(logPath), insist=True)
             waitForProcessPoolFinish()
 
+def cleanPatches():
+    expectedDirNames = set()  # format: chart_4370
+    for projPath in getFinishedProjPath():
+        sampleTxt = projPath / 'sampledMutIds.txt'
+        assert sampleTxt.exists()
+        m = re.match(r'(\w+)-(\d+f)', projPath.stem)
+        assert m is not None
+        projName = m[1]
+        mids = file2Lines(sampleTxt)
+        for mid in mids:
+            expectedDirNames.add(projName + "_" + mid)
+    assert len(expectedDirNames) == 1700
+    for dir in patchesDirPath.iterdir():
+        dirName = dir.stem
+        if dirName not in expectedDirNames:
+            print('[INFO] {} is not expected!'.format(dirName))
+            # shutil.rmtree(str(dir))
+            continue
+    for dirName in expectedDirNames:
+        expectedDir = patchesDirPath / dirName
+        if not expectedDir.exists():
+            print('[WARNING] No patch is generated for {}'.format(dirName))
+            continue
+        elif not (expectedDir / 'patches-pool' / 'patches.info').exists():
+            print('[WARNING] Patches for {} is not complete! File patches.info is missing.'.format(dirName))
+            continue
+
 if __name__ == '__main__':
     try:
         # genMutBenchBugPositions()
         main()
+        # cleanPatches()
+        # tmp()
         # runTbarOnSingleMutant('time', 16447)
         # checkAllPatches()
         # getAllMutators()
@@ -357,3 +397,4 @@ if __name__ == '__main__':
         for _, _, p, log in processPool:
             log.close()
             p.kill()
+        shutil.rmtree(str(tbarD4jProjDirPath), ignore_errors=True)
