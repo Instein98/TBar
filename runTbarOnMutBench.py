@@ -70,7 +70,7 @@ originalD4jProjDirPath = Path('../d4jProj').resolve()
 tbarD4jProjDirPath = Path('tbarD4jProj').resolve()  # copy the project need to be fixed here
 tbarD4jProjDirPath.mkdir(exist_ok=True)
 bugPositionFile = Path('MutBenchBugPositions.txt').resolve()
-patchesDirPath = Path('patches').resolve()
+patchesDirPath = Path('patches-1700').resolve()
 logDirPath = (Path('logs') / 'generation').resolve()
 logDirPath.mkdir(exist_ok=True)
 d4jHome = '/home/yicheng/research/apr/experiments/defects4j/'
@@ -107,18 +107,29 @@ def getD4jProperty(projPath: Path, property: str):
 def getD4jProjSrcRelativePath(projPath: Path):
     return getD4jProperty(projPath, 'dir.src.classes')
 
+# ======= For Distribution =======
+newSample={'collections': ['6152', '8112', '8343', '8216', '8348', '8108', '10087', '6148', '8492', '11864', '2652', '1508'], 'time': ['18136', '10081', '15493', '4864', '658', '12449', '2556', '19225', '10160', '2551', '4856', '8960', '11572'], 'math': ['94078', '118483', '94440', '108308', '118180', '94376', '115465', '41781', '94185', '117598', '115827', '94174', '92468', '109334', '118484', '94153', '117670', '108457', '107938', '118195', '115826', '35228', '16011', '118026', '27082', '1872', '35785', '39490', '116617', '95878', '35937', '111244', '110625', '39136', '74852', '110955', '64974', '63972', '22130', '7710', '116154', '101658', '110936', '117041', '84963', '35938', '109722', '38034', '111968', '17424', '15714', '34840', '41844', '60729', '95820', '57451', '117283', '81535', '19560', '117420', '117580', '111278', '103223', '34656', '119014', '19561', '35959', '5010', '108351', '27140', '113518', '48177', '108453', '32583', '111085', '111050', '103968', '96327', '77143', '58288', '116783', '14349', '42114', '15302', '14347', '80734', '36958', '8954', '16176', '3463', '62416', '118638', '42068', '94205', '117666', '94240', '94373', '93203', '66445', '118059', '14098', '108626', '18388', '118366', '118158', '62404', '94364', '59422', '93255', '118550', '108819', '2977'], 'codec': ['288', '691', '690', '669', '652', '1017', '497', '4217', '261', '297', '469', '316'], 'chart': ['70393', '70533', '34236', '76686', '34237', '54929'], 'jacksondatabind': ['927', '912', '7353', '40'], 'closure': ['48813', '31081', '31096', '13793', '30680', '13710', '36346', '90', '13942', '30743', '31012', '13724', '13866', '30845', '63', '36345', '144', '13957', '48224', '11209', '36349', '30923', '30740', '11445', '33315', '31023', '30953', '30739', '48791', '30709', '30952'], 'jacksonxml': ['292'], 'jxpath': ['12215', '9840', '7840', '10391', '10689', '10804', '8246', '9432', '10053', '7850', '10309', '7922'], 'jacksoncore': ['16309', '1370', '13101', '15722', '5817', '14170', '15781', '10690', '13052', '621', '15840', '10484', '1806', '15991', '15886', '15841', '10570', '11378', '345', '4570', '15799', '13888', '10988', '10606', '10516', '2147', '5447', '1367', '103', '12131', '290', '1366', '12861', '4441', '11980', '11868', '834', '6772', '11218', '3267', '16146', '10463', '12996', '15778', '7347', '3278', '14434', '11219', '6093', '14104', '14220', '12062'], 'compress': ['5465', '1623', '4844', '7964', '5574', '5847', '4899', '5371', '6028', '5858', '6121', '1504', '4853', '7940', '4816', '7966', '6174', '3497', '1607', '6128'], 'lang': ['7857', '7790', '7154', '6308', '7824', '21179', '15195', '15107', '14961', '15151', '17101', '6724', '6310', '15181', '5887', '5886', '7700', '7879', '3503', '6726', '16696']}
+# ======= ================ =======
+
 def genMutBenchBugPositions(targetFile=Path('./MutBenchBugPositions.txt')):
     positions = []
     for projPath in getFinishedProjPath():
-        projSrcRelativePath = getD4jProperty(projPath, 'dir.src.classes')
         projName = getProjNameFromProjPath(projPath)
+        # ======= For Distribution =======
+        if projName not in newSample:
+            continue
+        # ======= ================ =======
         mutLog = projPath / 'mutants.log'
         sampleTxt = projPath / 'sampledMutIds.txt'
         # print(str(projPath))
         assert mutLog.exists()
         assert sampleTxt.exists()
-        mids = file2Lines(sampleTxt)
+        # mids = file2Lines(sampleTxt)
+        # ======= For Distribution =======
+        mids = newSample[projName]
+        # ======= ================ =======
         minfos = file2Lines(mutLog)
+        projSrcRelativePath = getD4jProperty(projPath, 'dir.src.classes')
         for mid in mids:
             info = minfos[int(mid)-1]
             assert info.startswith(mid + ":")
@@ -230,7 +241,7 @@ def checkAllPatches():
                             mutator = getMutator(projPath, mid)
                             if mutator not in mutatorDict:
                                 mutatorDict[mutator] = []
-                            mutatorDict[mutator].append(projPath.stem)
+                            mutatorDict[mutator].append(projName + '-' + mid)
                             if projName not in resDict:
                                 resDict[projName] = []
                             resDict[projName].append(mid)
@@ -242,6 +253,8 @@ def checkAllPatches():
         print("{} mutants of {} are correctly (exactly) fixed!".format(len(resDict[key]), key))
     mutators = [k for k in mutatorDict]
     mutators.sort()
+    for m in mutators:
+        print("{} {}".format(m, mutatorDict[m]))
     for m in mutators:
         print("{} {}".format(m, len(mutatorDict[m])))
 
@@ -274,16 +287,23 @@ def tmp():
 def main():
     for projPath in getFinishedProjPath():
         print('=' * 10 + str(projPath) + '=' * 10)
-        srcRelativePath=getD4jProjSrcRelativePath(projPath)
-        buildRelativePath=getD4jProperty(projPath, 'dir.bin.classes')
+        srcRelativePath = None
+        buildRelativePath = None
         sampleTxt = projPath / 'sampledMutIds.txt'
         assert sampleTxt.exists()
         m = re.match(r'(\w+)-(\d+f)', projPath.stem)
         assert m is not None
         projName = m[1]
+        # ======= For Distribution =======
+        if projName not in newSample:
+            continue
+        # ======= ================ =======
         version = m[2]
         formalProjName = getProjFormalNameFromProjSimpleName(projName)
-        mids = file2Lines(sampleTxt)
+        # mids = file2Lines(sampleTxt)
+        # ======= For Distribution =======
+        mids = newSample[projName]
+        # ======= ================ =======
         for mid in mids:
             # check if it is already finished before
             patchesInfoFile = patchesDirPath / '{}_{}'.format(projName, mid) / 'patches-pool' / 'patches.info'
@@ -299,6 +319,11 @@ def main():
                 print('Try removing {} and checkout again...'.format(str(targetProjPath)))
                 shutil.rmtree(str(targetProjPath), ignore_errors=True)
                 sp.run('defects4j checkout -p {} -v {} -w {}'.format(formalProjName, version, str(targetProjPath)), shell=True, universal_newlines=True, check=True)
+            
+            if srcRelativePath is None or buildRelativePath is None:
+                srcRelativePath=getD4jProjSrcRelativePath(projPath)
+                buildRelativePath=getD4jProperty(projPath, 'dir.bin.classes')
+            
             # apply the mutant file
             fileToBeReplacedPath, javaFileRelativePath = applyMutant(targetProjPath, projPath, mid, srcRelativePath=srcRelativePath)
             javacOutputDirPath = str((Path(targetProjPath) / buildRelativePath / javaFileRelativePath).parent)
@@ -387,11 +412,11 @@ def cleanPatches():
 if __name__ == '__main__':
     try:
         # genMutBenchBugPositions()
-        main()
+        # main()
         # cleanPatches()
         # tmp()
         # runTbarOnSingleMutant('time', 16447)
-        # checkAllPatches()
+        checkAllPatches()
         # getAllMutators()
     finally:
         for _, _, p, log in processPool:
